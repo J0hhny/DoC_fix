@@ -1,0 +1,24 @@
+{
+  "name": "doc-fix",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "PPWR-Konformitaetserklaerung nach Anhang VIII der Verordnung (EU) 2025/40",
+  "scripts": {
+    "katalog": "node scripts/katalog-bauen.mjs",
+    "predev": "node scripts/katalog-bauen.mjs",
+    "dev": "vite",
+    "prebuild": "node scripts/katalog-bauen.mjs",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "exceljs": "^4.4.0",
+    "vite": "^6.0.0"
+  }
+}

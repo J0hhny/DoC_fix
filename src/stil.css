@@ -1,0 +1,111 @@
+:root {
+  --dunkel: #1f3864;
+  --text: #16181d;
+  --grau: #5f6673;
+  --linie: #dfe2e8;
+  --flaeche: #ffffff;
+  --grund: #f3f4f7;
+  --akzent: #1f3864;
+  --akzent-hell: #e9eef7;
+  --gruen: #2e7d32;
+  --rot: #b3261e;
+  --gelb: #8a6d00;
+  --gelb-hell: #fff6d6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--grund);
+}
+
+.seite { max-width: 46rem; margin: 0 auto; padding: 0 16px 4rem; }
+
+.testband {
+  margin: 0 -16px;
+  padding: 0.45rem 16px;
+  background: var(--gelb-hell);
+  color: var(--gelb);
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0e2a8;
+}
+
+.kopf { padding: 2.2rem 0 1.4rem; }
+.marke { margin: 0 0 1.4rem; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grau); }
+h1 { margin: 0 0 0.3rem; font-size: 1.65rem; line-height: 1.25; color: var(--dunkel); }
+.unter { margin: 0; color: var(--grau); font-size: 0.95rem; }
+
+.block {
+  background: var(--flaeche);
+  border: 1px solid var(--linie);
+  border-radius: 6px;
+  padding: 1.2rem 1.3rem 0.4rem;
+  margin-bottom: 1rem;
+}
+.block h2 { margin: 0 0 0.25rem; font-size: 1.05rem; color: var(--dunkel); }
+.blocktext { margin: 0 0 1rem; font-size: 0.88rem; color: var(--grau); }
+
+.frage { padding: 0.9rem 0; border-top: 1px solid var(--linie); }
+.blocktext + .frage, h2 + .frage { border-top: none; padding-top: 0.2rem; }
+.fragetext { display: block; font-weight: bold; font-size: 0.97rem; margin-bottom: 0.55rem; }
+.pflicht .fragetext::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--akzent); margin-right: 0.5rem; vertical-align: middle; }
+
+.marker { display: inline-block; font-weight: normal; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 3px; background: var(--grund); color: var(--grau); margin-left: 0.3rem; vertical-align: 1px; }
+.marker.warn { background: var(--gelb-hell); color: var(--gelb); }
+
+.wahl { display: flex; flex-direction: column; gap: 0.35rem; }
+.wahl.reihe { flex-direction: row; gap: 0.5rem; }
+.wahl label, .bestaetigung {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--linie); border-radius: 5px;
+  cursor: pointer; font-size: 0.95rem; background: #fff;
+}
+.wahl.reihe label { min-width: 6.5rem; }
+.wahl label.an, .bestaetigung.an { border-color: var(--akzent); background: var(--akzent-hell); }
+.wahl input, .bestaetigung input { margin: 0; accent-color: var(--akzent); }
+
+.eingabe {
+  width: 100%; font: inherit; padding: 0.5rem 0.65rem;
+  border: 1px solid #c9ced8; border-radius: 5px; background: #fff;
+}
+.eingabe.kurz { max-width: 14rem; }
+.eingabe:focus, .wahl label:focus-within, .bestaetigung:focus-within { outline: 2px solid var(--akzent); outline-offset: 1px; }
+textarea.eingabe { resize: vertical; }
+
+details { margin-top: 0.5rem; font-size: 0.88rem; color: var(--grau); }
+summary { cursor: pointer; color: var(--akzent); width: fit-content; }
+details p { margin: 0.4rem 0 0; }
+.fund { font-size: 0.8rem; }
+
+.vorschau { padding-bottom: 1.2rem; }
+.matrix { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.matrix th, .matrix td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--linie); vertical-align: top; }
+.matrix th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--grau); }
+.matrix td:last-child { white-space: nowrap; font-weight: bold; }
+.st-erfüllt td:last-child { color: var(--gruen); }
+.st-nicht-erfüllt td:last-child { color: var(--rot); }
+.st-offen td:last-child { color: var(--gelb); }
+.st-entfällt td:last-child, .st-keine-Anforderung td:last-child, .st-nicht-fällig td:last-child { color: var(--grau); font-weight: normal; }
+.abbruch { margin: 0.9rem 0 0; padding: 0.7rem 0.9rem; background: #fdecea; color: var(--rot); border-radius: 5px; font-size: 0.9rem; }
+
+.abschluss { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.4rem 0; }
+.abschluss p { margin: 0; color: var(--grau); }
+button { font: inherit; font-weight: bold; padding: 0.65rem 1.4rem; border: none; border-radius: 5px; background: var(--akzent); color: #fff; cursor: pointer; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.fuss { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--linie); font-size: 0.8rem; color: var(--grau); }
+
+@media (max-width: 520px) {
+  .kopf { padding-top: 1.6rem; }
+  h1 { font-size: 1.35rem; }
+  .block { padding: 1rem 0.9rem 0.3rem; }
+  .matrix td:nth-child(2), .matrix th:nth-child(2) { display: none; }
+  .matrix td:last-child { white-space: normal; }
+  .abschluss { flex-direction: column; align-items: stretch; }
+}
