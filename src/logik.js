@@ -35,7 +35,7 @@ function wertVon(frage, antwort) {
  * Baut den Auswerter für einen Katalog und einen Antwortstand.
  * Ergebnis wird je Aufruf frisch berechnet — Antworten ändern sich laufend.
  */
-export function auswerten(katalog, antworten) {
+export function auswerten(katalog, antworten, nachweisAntworten = {}) {
   const fragen = new Map(katalog.fragen.map((f) => [f.id, f]))
   const artikel = new Map(katalog.artikel.map((a) => [a.id, a]))
   const datumsFrage = katalog.fragen.find((f) => f.typ === 'datum' && f.block === 'Ausstellung')
@@ -94,10 +94,11 @@ export function auswerten(katalog, antworten) {
   function status(a) {
     const gilt = artikelGilt(a)
     if (gilt === false) return { status: STATUS.ENTFAELLT }
-    if (gilt === null) return { status: STATUS.OFFEN }
+    // Noch nicht fällig: Status steht fest, auch wenn die (freiwillige) Anwendbarkeitsfrage offen ist
     if (!faellig(a.giltAb)) {
       return { status: STATUS.NICHT_FAELLIG, text: `${a.fruehestens ? 'frühestens ab' : 'ab'} ${datumDE(a.giltAb)}` }
     }
+    if (gilt === null) return { status: STATUS.OFFEN }
     const pflicht = katalog.fragen.filter((f) => f.gehoertZu === a.id && f.wirkung === 'pflicht' && sichtbar(f.id))
     if (!pflicht.length) return { status: STATUS.KEINE_ANFORDERUNG }
     const negativ = pflicht.filter((f) => f.typ === 'ja/nein' && antworten[f.id] === 'nein')
@@ -106,16 +107,73 @@ export function auswerten(katalog, antworten) {
     return { status: STATUS.ERFUELLT }
   }
 
-  const sichtbareFragen = katalog.fragen.filter((f) => sichtbar(f.id))
+  /** Wie sichtbar(), aber ohne Datumsprüfung — für die Vorschau späterer Fragen. */
+  function sichtbarOhneDatum(f) {
+    if (f.gehoertZu) {
+      const a = artikel.get(f.gehoertZu)
+      if (artikelGilt(a, a.giltNurWenn?.feld === f.id) !== true) return false
+    }
+    return !f.sichtbarWenn || bedingungErfuellt(f.sichtbarWenn) === true
+  }
+
+  /**
+   * „nötig“ = muss zum Ausstellungsdatum beantwortet werden.
+   * „später“ = gehört zu einer Anforderung, die erst ab einem späteren Datum gilt.
+   *            Wird angezeigt (grau), darf aber leer bleiben und zählt nicht.
+   */
+  function kategorie(f) {
+    const a = f.gehoertZu ? artikel.get(f.gehoertZu) : null
+    if (sichtbar(f.id)) return a && !faellig(a.giltAb) ? 'später' : 'nötig'
+    return sichtbarOhneDatum(f) ? 'später' : null
+  }
+  /** Ab wann eine „später“-Frage gilt: das spätere von Frage- und Artikeldatum. */
+  function giltAbFuer(f) {
+    const a = f.gehoertZu ? artikel.get(f.gehoertZu) : null
+    const d = [f.giltAb, a?.giltAb].filter(Boolean).sort().pop()
+    return d ? { datum: d, fruehestens: !!a?.fruehestens } : null
+  }
+
+  const angezeigteFragen = katalog.fragen.filter((f) => kategorie(f))
+  const sichtbareFragen = angezeigteFragen.filter((f) => kategorie(f) === 'nötig')
   const offeneFragen = sichtbareFragen.filter((f) => !beantwortet(f))
+  const statusmatrix = katalog.artikel.map((a) => ({ artikel: a, ...status(a) }))
+  const statusNachId = new Map(statusmatrix.map((s) => [s.artikel.id, s.status]))
+
+  // Nachweis-Check: allgemeine immer, artikelbezogene nur bei „erfüllt“
+  // (bzw. „keine Anforderung“ für freiwillige Angaben wie Art. 8).
+  const sichtbareNachweise = katalog.nachweise.filter((n) => {
+    if (n.gehoertZu !== 'allgemein' &&
+      ![STATUS.ERFUELLT, STATUS.KEINE_ANFORDERUNG].includes(statusNachId.get(n.gehoertZu))) return false
+    if (!faellig(n.giltAb)) return false
+    return !n.sichtbarWenn || bedingungErfuellt(n.sichtbarWenn) === true
+  })
+  const offeneNachweise = sichtbareNachweise.filter((n) => !nachweisAntworten[n.id])
+  const luecken = sichtbareNachweise.filter((n) => nachweisAntworten[n.id] && nachweisAntworten[n.id] !== 'ja')
+
+  // Wirkung „hinweis“ mit Antwort Nein: blockiert nichts, erscheint im Lückenreport
+  const hinweise = angezeigteFragen.filter((f) => f.wirkung === 'hinweis' && f.typ === 'ja/nein' && antworten[f.id] === 'nein')
+
+  const maengel = statusmatrix
+    .filter((s) => s.status === STATUS.NICHT_ERFUELLT)
+    .flatMap((s) => s.mangel.map((id) => ({ artikel: s.artikel, frage: fragen.get(id) })))
 
   return {
     stichtag,
     sichtbar,
     beantwortet,
+    kategorie,
+    giltAbFuer,
+    angezeigteFragen,
     sichtbareFragen,
     offeneFragen,
-    statusmatrix: katalog.artikel.map((a) => ({ artikel: a, ...status(a) })),
+    statusmatrix,
+    sichtbareNachweise,
+    offeneNachweise,
+    luecken,
+    hinweise,
+    maengel,
+    abbruch: maengel.length > 0,
+    vollstaendig: offeneFragen.length === 0 && offeneNachweise.length === 0,
   }
 }
 

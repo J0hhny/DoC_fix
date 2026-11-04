@@ -27,7 +27,7 @@ const MODUS = (process.env.KATALOG_MODUS || 'test').toLowerCase()
 const KOPFZEILE = 4
 const TRENNER = '·'
 const ANTWORTTYPEN = ['ja/nein', 'bestätigung', 'auswahl', 'text', 'zahl', 'datum']
-const WIRKUNGEN = ['pflicht', 'info', 'daten', 'optional']
+const WIRKUNGEN = ['pflicht', 'hinweis', 'info', 'daten', 'optional']
 const BELEGE = ['P', 'K', '?']
 
 const fehler = []

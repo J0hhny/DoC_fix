@@ -2,11 +2,14 @@
  * Eine einzelne Frage — Darstellung je Antworttyp aus der Excel.
  */
 
-export default function Feld({ frage: f, wert, setze, fehlt }) {
+import { datumDE } from './logik.js'
+
+export default function Feld({ frage: f, wert, setze, fehlt, spaeter }) {
   const name = 'f_' + f.id
   const zusatz = (
     <>
-      {f.wirkung === 'optional' && <span className="marker">optional</span>}
+      {spaeter && <span className="marker spaeter">noch nicht nötig · {spaeter.fruehestens ? 'frühestens ab' : 'ab'} {datumDE(spaeter.datum)}</span>}
+      {!spaeter && f.wirkung === 'optional' && <span className="marker">optional</span>}
       {f.beleg === '?' && <span className="marker warn">Platzhalter</span>}
     </>
   )
@@ -62,7 +65,7 @@ export default function Feld({ frage: f, wert, setze, fehlt }) {
   }
 
   return (
-    <div className={'frage' + (fehlt ? ' fehlt' : '') + (f.wirkung === 'pflicht' ? ' pflicht' : '')}>
+    <div className={'frage' + (spaeter ? ' spaeter' : ' noetig') + (fehlt ? ' fehlt' : '') + (f.wirkung === 'pflicht' && !spaeter ? ' pflicht' : '')}>
       <label className="fragetext" htmlFor={['text', 'zahl', 'datum'].includes(f.typ) ? name : undefined}>
         {f.frage} {zusatz}
       </label>

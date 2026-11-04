@@ -4,7 +4,7 @@ Onlinetool zur Erstellung der EU-Konformitätserklärung für Verpackungen nach 
 
 Konzept, Entscheidungen und Fachlogik liegen außerhalb dieses Repos im Projektordner `PROJECTS/Konformitätsverordnung`.
 
-**Stand 04.11.2026:** Schritt 2 (Prüfskript) und Schritt 3 (Formular) fertig. Die Statusmatrix erscheint als Vorschau, die Ergebnisseite folgt.
+**Stand 04.11.2026:** MVP funktionsfähig — Prüfskript, Formular mit aufklappbaren Bereichen, Auswertung, Nachweis-Check und drei druckbare Dokumente (Erklärung, Lückenreport, Checkliste) bzw. Mängelliste bei Abbruch.
 
 ---
 
@@ -15,7 +15,10 @@ Konzept, Entscheidungen und Fachlogik liegen außerhalb dieses Repos im Projekto
 | `katalog/fragenkatalog-ppwr.xlsx` | **Der Fragenkatalog. Die einzige Datei, die du im laufenden Betrieb änderst.** Anleitung im Blatt „Legende“. | ja |
 | `scripts/katalog-bauen.mjs` | Prüft die Excel vor jedem Build und erzeugt daraus `src/katalog.json` | nein |
 | `src/logik.js` | Feste Regeln: wann eine Frage sichtbar ist, welcher Status gilt | selten |
-| `src/App.jsx` | Aufbau der Seite | selten |
+| `src/App.jsx` | Aufbau der Seite: Formular → Ergebnis | selten |
+| `src/Block.jsx` | Auf- und zuklappbarer Fragebereich | selten |
+| `src/Nachweis.jsx` | Eine Zeile im Nachweis-Check | selten |
+| `src/Dokumente.jsx` | Erklärung, Lückenreport, Checkliste, Mängelliste | selten |
 | `src/Feld.jsx` | Darstellung einer einzelnen Frage je Antworttyp | selten |
 | `src/stil.css` | Aussehen | selten |
 | `src/main.jsx`, `index.html`, `vite.config.js` | Technischer Rahmen | nie |
