@@ -9,7 +9,8 @@
  *   test       (Standard)  „?“ im Belegstatus erlaubt, wird nur gemeldet
  *   produktiv  KATALOG_MODUS=produktiv  „?“ bricht ab
  *
- * Gelesen werden nur die Blätter „Artikel“, „Fragen“ und „Nachweise“.
+ * Gelesen werden nur die Blätter „Artikel“, „Fragen“, „Nachweise“ und
+ * „Datenfelder“ (Messwerte je Bauteil, seit 06.11.2026).
  * Spalten werden über ihre Überschrift in Zeile 4 gefunden, nicht über
  * ihre Position — eine Spalte zu verschieben ist also unschädlich.
  */
@@ -29,6 +30,9 @@ const TRENNER = '·'
 const ANTWORTTYPEN = ['ja/nein', 'bestätigung', 'auswahl', 'text', 'zahl', 'datum']
 const WIRKUNGEN = ['pflicht', 'hinweis', 'info', 'daten', 'optional']
 const BELEGE = ['P', 'K', '?']
+const EINHEITEN = ['mg/kg', 'µg/kg']
+const VERGLEICHE = ['≤', '<']
+const EBENEN = ['je Bauteil']
 
 const fehler = []
 const hinweise = []
@@ -130,17 +134,20 @@ const S = {
     'Fundstelle', 'Beleg'],
   nachweise: ['ID', 'Gehört zu', 'Nachweis — Frage an den Nutzer', 'Erklärtext (Aufklapper)', 'Anhang VII',
     'Wer liefert', 'Sichtbar wenn — Feld', 'Sichtbar wenn — Wert', 'Gilt ab', 'Fundstelle', 'Beleg'],
+  datenfelder: ['ID', 'Gehört zu', 'Datenfeld — Bezeichnung', 'Erklärtext (Aufklapper)', 'Einheit', 'Vergleich',
+    'Grenzwert', 'Ebene', 'Speist Frage', 'Speist Nachweis', 'Fundstelle', 'Beleg'],
 }
 
 const rohArtikel = blattLesen(mappe, 'Artikel', S.artikel)
 const rohFragen = blattLesen(mappe, 'Fragen', S.fragen)
 const rohNachweise = blattLesen(mappe, 'Nachweise', S.nachweise)
+const rohDatenfelder = blattLesen(mappe, 'Datenfelder', S.datenfelder)
 
 if (fehler.length) abbrechen()
 
 // IDs eindeutig, über alle Blätter
 const gesehen = new Map()
-for (const z of [...rohArtikel, ...rohFragen, ...rohNachweise]) {
+for (const z of [...rohArtikel, ...rohFragen, ...rohNachweise, ...rohDatenfelder]) {
   if (!z.ID) { fehler.push(`${ort(z, 'ID')}: ID fehlt.`); continue }
   if (/\s/.test(z.ID)) fehler.push(`${ort(z, 'ID')}: „${z.ID}“ enthält ein Leerzeichen.`)
   if (gesehen.has(z.ID)) fehler.push(`${ort(z, 'ID')}: ID „${z.ID}“ gibt es schon (${ort(gesehen.get(z.ID))}).`)
@@ -280,8 +287,47 @@ const nachweise = rohNachweise.map((z) => {
   }
 })
 
+// ---- Datenfelder (Messwerte je Bauteil)
+const fragenObjNachId = new Map(fragen.map((f) => [f.id, f]))
+const nachweisIds = new Set(nachweise.map((n) => n.id))
+const datenfelder = rohDatenfelder.map((z) => {
+  if (!z['Datenfeld — Bezeichnung']) fehler.push(`${ort(z, 'Datenfeld — Bezeichnung')}: leer.`)
+  const gz = z['Gehört zu']
+  if (!artikelIds.has(gz)) fehler.push(`${ort(z, 'Gehört zu')}: „${gz || '(leer)'}“ ist keine Artikel-ID.`)
+  wertAusListe(z, 'Einheit', EINHEITEN)
+  wertAusListe(z, 'Vergleich', VERGLEICHE)
+  wertAusListe(z, 'Ebene', EBENEN)
+  wertAusListe(z, 'Beleg', BELEGE)
+  const grenzwert = Number(String(z['Grenzwert']).replace(',', '.'))
+  if (!z['Grenzwert'] || !Number.isFinite(grenzwert)) fehler.push(`${ort(z, 'Grenzwert')}: „${z['Grenzwert'] || '(leer)'}“ ist keine Zahl.`)
+  const f = fragenObjNachId.get(z['Speist Frage'])
+  if (!f) fehler.push(`${ort(z, 'Speist Frage')}: „${z['Speist Frage'] || '(leer)'}“ gibt es im Blatt „Fragen“ nicht.`)
+  else {
+    if (f.typ !== 'ja/nein') fehler.push(`${ort(z, 'Speist Frage')}: „${f.id}“ muss eine ja/nein-Frage sein (ist „${f.typ}“).`)
+    if (f.gehoertZu !== gz) fehler.push(`${ort(z, 'Speist Frage')}: „${f.id}“ gehört zu „${f.gehoertZu}“, das Datenfeld zu „${gz}“.`)
+  }
+  if (z['Speist Nachweis'] && !nachweisIds.has(z['Speist Nachweis'])) {
+    fehler.push(`${ort(z, 'Speist Nachweis')}: „${z['Speist Nachweis']}“ gibt es im Blatt „Nachweise“ nicht.`)
+  }
+  if (z['Beleg'] === '?') hinweise.push(`${ort(z)}: „${z.ID}“ ist ungesichert (?).`)
+  return {
+    id: z.ID,
+    gehoertZu: gz,
+    bezeichnung: z['Datenfeld — Bezeichnung'],
+    erklaerung: z['Erklärtext (Aufklapper)'] || null,
+    einheit: z['Einheit'],
+    vergleich: z['Vergleich'],
+    grenzwert,
+    ebene: z['Ebene'],
+    frage: z['Speist Frage'],
+    nachweis: z['Speist Nachweis'] || null,
+    fundstelle: z['Fundstelle'] || null,
+    beleg: z['Beleg'],
+  }
+})
+
 // ---- Belegstatus im Produktivbetrieb
-const offen = [...artikel, ...fragen, ...nachweise].filter((x) => x.beleg === '?')
+const offen = [...artikel, ...fragen, ...nachweise, ...datenfelder].filter((x) => x.beleg === '?')
 if (MODUS === 'produktiv' && offen.length) {
   fehler.push(`Produktivbetrieb: ${offen.length} Einträge sind noch ungesichert (?): ${offen.map((x) => x.id).join(', ')}.`)
 }
@@ -297,12 +343,13 @@ const katalog = {
   artikel,
   fragen,
   nachweise,
+  datenfelder,
 }
 mkdirSync(dirname(ZIEL), { recursive: true })
 writeFileSync(ZIEL, JSON.stringify(katalog, null, 2) + '\n', 'utf8')
 
 console.log(`\n✔ Fragenkatalog geprüft (Modus: ${MODUS})`)
-console.log(`  ${artikel.length} Artikel · ${fragen.length} Fragen · ${nachweise.length} Nachweise`)
+console.log(`  ${artikel.length} Artikel · ${fragen.length} Fragen · ${nachweise.length} Nachweise · ${datenfelder.length} Datenfelder`)
 if (offen.length) console.log(`  ${offen.length} ungesichert (?): ${offen.map((x) => x.id).join(', ')}`)
 for (const h of hinweise.filter((h) => !h.includes('ungesichert'))) console.log(`  Hinweis: ${h}`)
 console.log(`  → ${ZIEL.replace(WURZEL + '/', '').replace(WURZEL + '\\', '')}\n`)

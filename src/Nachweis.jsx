@@ -3,14 +3,22 @@
  */
 
 import { quelle } from './Dokumente.jsx'
+import { Herleitung } from './Herleitung.jsx'
 
 const WAHL = [['ja', 'Liegt vor'], ['nein', 'Fehlt'], ['unklar', 'Unklar']]
 
-export default function Nachweis({ nachweis: n, wert, setze }) {
+export default function Nachweis({ nachweis: n, wert, setze, abgeleitet }) {
   const name = 'n_' + n.id
   return (
     <div className={'frage noetig' + (wert ? '' : ' fehlt')}>
       <span className="fragetext">{n.frage}</span>
+      {abgeleitet ? (
+        <div className="abgeleitet">
+          <span className={'antwort ' + (wert === 'ja' ? 'ja' : 'nein')}>{WAHL.find((w) => w[0] === wert)?.[1]}</span>
+          <span className="marker">aus Bauteildaten</span>
+          <Herleitung eintraege={abgeleitet.eintraege} nachweis />
+        </div>
+      ) : (
       <div className="wahl reihe">
         {WAHL.map(([w, text]) => (
           <label key={w} className={wert === w ? 'an' : ''}>
@@ -19,6 +27,7 @@ export default function Nachweis({ nachweis: n, wert, setze }) {
           </label>
         ))}
       </div>
+      )}
       <details>
         <summary>Erläuterung</summary>
         {n.erklaerung && <p>{n.erklaerung}</p>}

@@ -13,6 +13,8 @@ import Feld from './Feld.jsx'
 import Block from './Block.jsx'
 import Nachweis from './Nachweis.jsx'
 import { Erklaerung, Lueckenreport, Checkliste, Maengelliste, erklaerungsNummer } from './Dokumente.jsx'
+import Bauteile from './Bauteile.jsx'
+import { pruefeBauteile, leeresProjekt, projektExport, projektImport, beispielHonigglas, ERGEBNIS } from './bauteile.js'
 
 const BLOCK_TEXT = {
   Ausstellung: 'Das Datum entscheidet, welche Anforderungen der Verordnung bereits gelten.',
@@ -24,6 +26,7 @@ const BLOCK_TEXT = {
 }
 const NACHWEIS_BLOCK = 'Technische Dokumentation'
 const NACHWEIS_TEXT = 'Liegen die Unterlagen vor, mit denen Sie die Konformität belegen? Die Abfrage richtet sich nach den Anforderungen, die Sie oben als erfüllt angegeben haben. Fehlende Nachweise blockieren die Erklärung nicht, sie erscheinen im Lückenreport.'
+const BAUTEIL_BLOCK = 'Bauteile und Messwerte'
 const ANFANGS_OFFEN = ['Ausstellung', 'Profil']
 const TESTMODUS = katalog.modus !== 'produktiv'
 
@@ -42,13 +45,51 @@ export default function App() {
   const [ansicht, setAnsicht] = useState('formular') // formular · ergebnis
   const [dokument, setDokument] = useState('erklaerung')
   const [druckAlle, setDruckAlle] = useState(false)
+  const [projekt, setProjekt] = useState(leeresProjekt)
+  const [meldung, setMeldung] = useState('')
 
   const setze = (id, wert) => setAntworten((a) => ({ ...a, [id]: wert }))
   const setzeNachweis = (id, wert) => setNachweise((a) => ({ ...a, [id]: wert }))
   const umschalten = (name) => setOffen((o) => ({ ...o, [name]: !o[name] }))
 
-  const e = useMemo(() => auswerten(katalog, antworten, nachweise), [antworten, nachweise])
-  const nummer = erklaerungsNummer(antworten, e.stichtag)
+  // Zwei Durchläufe: erst ohne Bauteildaten (welche Fragen sind sichtbar?),
+  // dann mit den daraus abgeleiteten Antworten. Abgeleitet schlägt Selbstauskunft.
+  const { e, pruefung, aEff, nEff } = useMemo(() => {
+    const e0 = auswerten(katalog, antworten, nachweise)
+    const pruefung = pruefeBauteile(katalog, e0, projekt)
+    const aEff = { ...antworten, ...pruefung.antworten }
+    const nEff = { ...nachweise, ...pruefung.nachweise }
+    return { e: auswerten(katalog, aEff, nEff), pruefung, aEff, nEff }
+  }, [antworten, nachweise, projekt])
+  const nummer = erklaerungsNummer(aEff, e.stichtag)
+
+  function speichern() {
+    const daten = projektExport({ antworten, nachweise, projekt })
+    const blob = new Blob([JSON.stringify(daten, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const name = (antworten.b1 || 'verpackung').replace(/[^\wäöüÄÖÜß-]+/g, '_').slice(0, 40)
+    a.href = url
+    a.download = `DoC_fix_${name}_${e.stichtag}.json`
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    setMeldung('Projektdatei gespeichert. Bewahren Sie sie zusammen mit den Dokumenten auf.')
+  }
+
+  async function oeffnen(ev) {
+    const datei = ev.target.files?.[0]
+    ev.target.value = ''
+    if (!datei) return
+    try {
+      const d = projektImport(JSON.parse(await datei.text()))
+      setAntworten(d.antworten)
+      setNachweise(d.nachweise)
+      setProjekt(d.projekt)
+      setMeldung(`Projekt „${datei.name}“ geöffnet.`)
+    } catch (err) {
+      setMeldung('Datei konnte nicht geöffnet werden: ' + err.message)
+    }
+  }
 
   const alleBloecke = bloecke(e.angezeigteFragen)
   const posNormen = alleBloecke.findIndex((b) => b.name === 'Normen')
@@ -56,7 +97,7 @@ export default function App() {
   const auswertbar = e.vollstaendig || e.abbruch
 
   function alle(auf) {
-    const namen = [...alleBloecke.map((b) => b.name), NACHWEIS_BLOCK]
+    const namen = [...alleBloecke.map((b) => b.name), NACHWEIS_BLOCK, BAUTEIL_BLOCK]
     setOffen(Object.fromEntries(namen.map((n) => [n, auf])))
   }
 
@@ -68,7 +109,7 @@ export default function App() {
 
   // ---------------------------------------------------------------- Ergebnis
   if (ansicht === 'ergebnis') {
-    const props = { katalog, a: antworten, e, na: nachweise, nummer }
+    const props = { katalog, a: aEff, e, na: nEff, nummer, pruefung }
     const docs = e.abbruch
       ? [['maengel', 'Mängelliste', <Maengelliste key="m" {...props} />]]
       : [
@@ -104,7 +145,18 @@ export default function App() {
     <Block key={NACHWEIS_BLOCK} titel={NACHWEIS_BLOCK + ' — Nachweis-Check'} text={NACHWEIS_TEXT}
       offen={!!offen[NACHWEIS_BLOCK]} umschalten={() => umschalten(NACHWEIS_BLOCK)}
       gesamt={e.sichtbareNachweise.length} fehlend={e.offeneNachweise.length}>
-      {e.sichtbareNachweise.map((n) => <Nachweis key={n.id} nachweis={n} wert={nachweise[n.id]} setze={setzeNachweis} />)}
+      {e.sichtbareNachweise.map((n) => <Nachweis key={n.id} nachweis={n} wert={nEff[n.id]} setze={setzeNachweis} abgeleitet={pruefung.nachweisDetails[n.id]} />)}
+    </Block>
+  )
+
+  const offeneBauteilWerte = pruefung.ergebnisse.filter((r) => r.ergebnis !== ERGEBNIS.ERFUELLT && r.ergebnis !== ERGEBNIS.NICHT_ERFUELLT).length
+  const bauteilBlock = (
+    <Block key={BAUTEIL_BLOCK} titel={BAUTEIL_BLOCK + ' — Daten aus Lieferantenunterlagen'}
+      offen={!!offen[BAUTEIL_BLOCK]} umschalten={() => umschalten(BAUTEIL_BLOCK)}
+      gesamt={pruefung.ergebnisse.length} fehlend={offeneBauteilWerte}
+      label={projekt.bauteile.length ? null : 'optional'}>
+      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} testmodus={TESTMODUS}
+        beispiel={() => setProjekt(beispielHonigglas())} />
     </Block>
   )
 
@@ -119,12 +171,15 @@ export default function App() {
         spaeterAb={b.fragen.every((f) => e.kategorie(f) === 'später') ? e.giltAbFuer(b.fragen[0]) : null}>
         {b.fragen.map((f) => {
           const spaeter = e.kategorie(f) === 'später'
-          return <Feld key={f.id} frage={f} wert={antworten[f.id]} setze={setze}
-            fehlt={!spaeter && !e.beantwortet(f)} spaeter={spaeter ? e.giltAbFuer(f) : null} />
+          return <Feld key={f.id} frage={f} wert={aEff[f.id]} setze={setze}
+            fehlt={!spaeter && !e.beantwortet(f)} spaeter={spaeter ? e.giltAbFuer(f) : null}
+            abgeleitet={pruefung.details[f.id]} />
         })}
       </Block>,
     )
+    if (b.name === 'Profil') inhalt.push(bauteilBlock)
   })
+  if (!alleBloecke.some((b) => b.name === 'Profil')) inhalt.unshift(bauteilBlock)
   if (posNormen < 0) inhalt.push(nachweisBlock)
 
   return (
@@ -147,7 +202,12 @@ export default function App() {
       <div className="leiste">
         <button type="button" className="link" onClick={() => alle(true)}>Alle Bereiche aufklappen</button>
         <button type="button" className="link" onClick={() => alle(false)}>Alle zuklappen</button>
+        <span className="projekt">
+          <button type="button" className="link" onClick={speichern}>Projekt speichern (Datei)</button>
+          <label className="link">Projekt öffnen<input type="file" accept=".json,application/json" hidden onChange={oeffnen} /></label>
+        </span>
       </div>
+      {meldung && <p className="meldung" role="status">{meldung}</p>}
 
       <main>
         {inhalt}

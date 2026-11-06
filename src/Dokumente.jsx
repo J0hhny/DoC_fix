@@ -169,7 +169,36 @@ function gruppieren(liste, katalog) {
   return [...gruppen.values()]
 }
 
-export function Lueckenreport({ katalog, a, e, na, nummer }) {
+/** Lücken aus den Bauteildaten, je Lieferant — Grundlage für die Anfrage. */
+function LieferantenAnfragen({ pruefung, katalog }) {
+  if (!pruefung?.lieferanten?.length) return null
+  const nachweisText = new Map(katalog.nachweise.map((n) => [n.id, n.frage]))
+  return (
+    <section>
+      <h2>Anfragen an Lieferanten</h2>
+      <p className="feld abstand">Diese Angaben fehlen in den Bauteildaten. Fordern Sie sie beim jeweiligen Lieferanten an.</p>
+      {pruefung.lieferanten.map((l) => (
+        <div key={l.name} className="lieferant">
+          <h3>{l.name}</h3>
+          <table>
+            <thead><tr><th>Bauteil</th><th>Benötigte Angabe</th><th className="status">Stand</th></tr></thead>
+            <tbody>
+              {l.eintraege.map((r) => (
+                <tr key={r.bauteil.id + r.feld.id}>
+                  <td>{r.bauteil.name || 'Bauteil'}{r.bauteil.material && <div className="klein">{r.bauteil.material}</div>}</td>
+                  <td>{r.feld.bezeichnung} ({r.feld.einheit})<div className="klein">{r.feld.fundstelle}{r.feld.nachweis && ` · Beleg: ${nachweisText.get(r.feld.nachweis)}`}</div></td>
+                  <td className="status ja">{r.problem}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+export function Lueckenreport({ katalog, a, e, na, nummer, pruefung }) {
   const spaeter = e.statusmatrix.filter((s) => s.status === STATUS.NICHT_FAELLIG)
   return (
     <article className="blatt">
@@ -184,6 +213,8 @@ export function Lueckenreport({ katalog, a, e, na, nummer }) {
         </p>
         <p className="feld">Die Erklärung gilt nur, wenn die Konformität anhand der technischen Dokumentation nachgewiesen werden kann. Fehlende Nachweise sollten Sie vor der Ausgabe der Erklärung an Handelskunden schließen.</p>
       </section>
+
+      <LieferantenAnfragen pruefung={pruefung} katalog={katalog} />
 
       {gruppieren(e.luecken, katalog).map((g) => (
         <section key={g.titel}>

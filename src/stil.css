@@ -178,6 +178,58 @@ button.zweit { background: #fff; color: var(--akzent); border: 1px solid var(--a
 .testvermerk { display: block; margin-top: 4px; color: #8a6d00; }
 
 @page { size: A4; margin: 1.5cm 1.8cm; }
+
+/* ---------------------------------------------------------------- Bauteile (Branch bauteile) */
+.leiste { flex-wrap: wrap; align-items: center; }
+.leiste .projekt { margin-left: auto; display: flex; gap: 1rem; }
+label.link { color: var(--akzent); font-size: 0.88rem; text-decoration: underline; cursor: pointer; padding: 0.2rem 0; }
+button.link.warn { color: var(--rot); }
+button.zweit { background: var(--akzent-hell); color: var(--akzent); }
+.meldung { margin: 0 0 0.7rem; padding: 0.5rem 0.8rem; background: var(--akzent-hell); border-radius: 5px; font-size: 0.88rem; }
+.klein { font-size: 0.78rem; color: var(--grau); }
+
+.bauteile h3 { font-size: 0.95rem; margin: 1.2rem 0 0.4rem; color: var(--dunkel); }
+.dokzeile, .bauteilkopf { display: grid; grid-template-columns: 2fr 1.2fr 1.4fr auto; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
+.dokzeile { grid-template-columns: 2fr 1.2fr 1.3fr 9rem auto; }
+.bauteile select { font: inherit; font-size: 0.85rem; padding: 0.4rem; border: 1px solid #c9ced8; border-radius: 5px; background: #fff; max-width: 100%; }
+.bauteil { border: 1px solid var(--linie); border-radius: 6px; padding: 0.7rem; margin-bottom: 0.6rem; background: #fff; }
+.bauteil.unter { margin: 0.6rem 0 0.4rem 1rem; background: var(--grund); }
+.messwerte { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.4rem; }
+.messwerte th { text-align: left; font-size: 0.72rem; text-transform: uppercase; color: var(--grau); padding: 0.3rem; }
+.messwerte td { padding: 0.35rem 0.3rem; border-top: 1px solid var(--linie); vertical-align: top; }
+.messwerte td:first-child { width: 32%; }
+.messwerte td:nth-child(4) select { width: 100%; }
+.wertzelle { white-space: nowrap; }
+.eingabe.zahl { width: 6rem; padding: 0.35rem 0.5rem; }
+.eingabe.seite { width: 4.5rem; padding: 0.35rem 0.5rem; margin-left: 0.3rem; }
+.kleiner { font-size: 0.85rem; margin-right: 0.3rem; }
+
+.erg { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 0.1rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.erg-ok { background: #e6f2e7; color: var(--gruen); }
+.erg-nein { background: #fdecea; color: var(--rot); }
+.erg-fehlt { background: var(--grund); color: var(--grau); }
+.erg-unklar { background: var(--gelb-hell); color: var(--gelb); }
+
+.abgeleitet { margin-top: 0.4rem; }
+.abgeleitet .antwort { font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 5px; border: 1px solid var(--akzent); background: var(--akzent-hell); }
+.abgeleitet .antwort.nein { border-color: var(--rot); background: #fdecea; color: var(--rot); }
+.teilweise { margin-top: 0.5rem; padding: 0.5rem 0.7rem; background: var(--gelb-hell); border-radius: 5px; font-size: 0.85rem; }
+.teilweise p { margin: 0 0 0.3rem; color: var(--gelb); }
+.herleitung { border-collapse: collapse; font-size: 0.8rem; margin-top: 0.5rem; }
+.herleitung td { padding: 0.15rem 0.6rem 0.15rem 0; }
+.lieferant h3 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+
+@media screen and (max-width: 820px) {
+  .dokzeile, .bauteilkopf { grid-template-columns: 1fr 1fr; }
+  .messwerte thead { display: none; }
+  .messwerte tr { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; border-top: 1px solid var(--linie); padding: 0.4rem 0; }
+  .messwerte td { border: none; }
+  .messwerte td:first-child { grid-column: 1 / -1; width: auto; }
+  .messwerte select { width: 100%; }
+  .wertzelle { white-space: normal; }
+  .eingabe.zahl { width: 4.5rem; }
+}
+
 @media print {
   body, .ergebnis { background: #fff; }
   .werkzeug { display: none !important; }

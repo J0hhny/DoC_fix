@@ -1,6 +1,6 @@
 {
   "name": "doc-fix",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "PPWR-Konformitaetserklaerung nach Anhang VIII der Verordnung (EU) 2025/40",
