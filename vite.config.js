@@ -6,7 +6,16 @@ export default defineConfig({
   // Relative Pfade: die gebaute Version laeuft dadurch auch dann,
   // wenn man sie ohne Webserver direkt aus einem Ordner oeffnet.
   base: './',
-  build: {
-    outDir: 'dist',
-  },
+  build: process.env.EINZELDATEI
+    ? {
+        // Testversion als eine einzige HTML-Datei (npm run build:einzeldatei):
+        // alles inline, damit sie per Doppelklick ohne Webserver läuft.
+        outDir: 'dist-einzeldatei',
+        assetsInlineLimit: 100_000_000,
+        cssCodeSplit: false,
+        rollupOptions: { output: { inlineDynamicImports: true } },
+      }
+    : {
+        outDir: 'dist',
+      },
 })

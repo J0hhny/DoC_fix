@@ -6,3 +6,4 @@ src/katalog.json
 .vscode
 ~$*.xlsx
 .~lock.*
+dist-einzeldatei

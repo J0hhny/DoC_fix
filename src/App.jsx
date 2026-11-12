@@ -44,7 +44,7 @@ export default function App() {
   const [offen, setOffen] = useState(() => Object.fromEntries(ANFANGS_OFFEN.map((b) => [b, true])))
   const [ansicht, setAnsicht] = useState('formular') // formular · ergebnis
   const [dokument, setDokument] = useState('erklaerung')
-  const [druckAlle, setDruckAlle] = useState(false)
+  const [pdfLaeuft, setPdfLaeuft] = useState(false)
   const [projekt, setProjekt] = useState(leeresProjekt)
   const [meldung, setMeldung] = useState('')
 
@@ -81,7 +81,15 @@ export default function App() {
     ev.target.value = ''
     if (!datei) return
     try {
-      const d = projektImport(JSON.parse(await datei.text()))
+      let json
+      if (datei.name.toLowerCase().endsWith('.pdf') || datei.type === 'application/pdf') {
+        const { projektAusPdf } = await import('./pdf/erzeugen.js')
+        json = await projektAusPdf(new Uint8Array(await datei.arrayBuffer()))
+        if (!json) throw new Error('In diesem PDF ist keine Projektdatei eingebettet. Nur PDFs, die mit diesem Tool erstellt wurden, lassen sich öffnen.')
+      } else {
+        json = JSON.parse(await datei.text())
+      }
+      const d = projektImport(json)
       setAntworten(d.antworten)
       setNachweise(d.nachweise)
       setProjekt(d.projekt)
@@ -101,10 +109,21 @@ export default function App() {
     setOffen(Object.fromEntries(namen.map((n) => [n, auf])))
   }
 
-  function drucken(alleDrei) {
-    setDruckAlle(alleDrei)
-    window.addEventListener('afterprint', () => setDruckAlle(false), { once: true })
-    setTimeout(() => window.print(), 50)
+  /** Echtes PDF im Browser erzeugen; die Projektdatei steckt als Anhang darin. */
+  async function pdfHerunterladen(ids) {
+    setPdfLaeuft(true)
+    setMeldung('')
+    try {
+      const { pdfErzeugen, dateiname, herunterladen } = await import('./pdf/erzeugen.js')
+      const props = { katalog, a: aEff, e, na: nEff, nummer, pruefung, testmodus: TESTMODUS }
+      const blob = await pdfErzeugen(ids, props, projektExport({ antworten, nachweise, projekt }))
+      herunterladen(blob, dateiname(ids, nummer))
+    } catch (err) {
+      console.error(err)
+      setMeldung('PDF konnte nicht erstellt werden: ' + err.message)
+    } finally {
+      setPdfLaeuft(false)
+    }
   }
 
   // ---------------------------------------------------------------- Ergebnis
@@ -119,7 +138,7 @@ export default function App() {
         ]
     const aktiv = docs.find((d) => d[0] === dokument) ? dokument : docs[0][0]
     return (
-      <div className={'ergebnis' + (druckAlle ? ' druck-alle' : '')}>
+      <div className="ergebnis">
         <div className="werkzeug">
           <button type="button" className="zurueck" onClick={() => setAnsicht('formular')}>← Angaben ändern</button>
           <div className="reiter" role="tablist">
@@ -128,10 +147,17 @@ export default function App() {
             ))}
           </div>
           <div className="druckknoepfe">
-            <button type="button" onClick={() => drucken(false)}>Dieses Dokument drucken / als PDF</button>
-            {docs.length > 1 && <button type="button" className="zweit" onClick={() => drucken(true)}>Alle drei drucken</button>}
+            <button type="button" disabled={pdfLaeuft} onClick={() => pdfHerunterladen([aktiv])}>
+              {pdfLaeuft ? 'PDF wird erstellt …' : 'Dieses Dokument als PDF'}
+            </button>
+            {docs.length > 1 && (
+              <button type="button" className="zweit" disabled={pdfLaeuft} onClick={() => pdfHerunterladen(docs.map((d) => d[0]))}>
+                Alle drei in einem PDF
+              </button>
+            )}
           </div>
-          <p className="druckhinweis">Im Druckdialog „Als PDF speichern“ wählen und unter „Weitere Einstellungen“ den Haken bei „Kopf- und Fußzeilen“ entfernen.</p>
+          <p className="druckhinweis">Im PDF ist Ihre Projektdatei eingebettet. Über „Projekt öffnen“ laden Sie es später wieder und arbeiten am selben Stand weiter.</p>
+          {meldung && <p className="meldung" role="status">{meldung}</p>}
         </div>
         {docs.map(([id, , el]) => (
           <div key={id} className={'dok' + (aktiv === id ? ' sichtbar' : '')} data-dok={id}>{el}</div>
@@ -204,7 +230,7 @@ export default function App() {
         <button type="button" className="link" onClick={() => alle(false)}>Alle zuklappen</button>
         <span className="projekt">
           <button type="button" className="link" onClick={speichern}>Projekt speichern (Datei)</button>
-          <label className="link">Projekt öffnen<input type="file" accept=".json,application/json" hidden onChange={oeffnen} /></label>
+          <label className="link">Projekt öffnen<input type="file" accept=".json,.pdf,application/json,application/pdf" hidden onChange={oeffnen} /></label>
         </span>
       </div>
       {meldung && <p className="meldung" role="status">{meldung}</p>}
