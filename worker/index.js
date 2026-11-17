@@ -128,6 +128,18 @@ export default {
     const { pathname } = new URL(request.url)
     try {
       if (pathname === '/api/ping') return json({ ok: true })
+      // Diagnose ohne Werte: zeigt nur, ob und in welcher Form die Einstellungen ankommen.
+      if (pathname === '/api/status') {
+        const z = env.ZUGANGS_KEYS
+        return json({
+          GEMINI_KEY: env.GEMINI_KEY ? `gesetzt (${String(env.GEMINI_KEY).length} Zeichen)` : 'fehlt',
+          ZUGANGS_KEYS: z === undefined ? 'fehlt' : `gesetzt (${String(z).length} Zeichen)`,
+          hashesGefunden: (String(z || '').toLowerCase().match(/[0-9a-f]{64}/g) || []).length,
+          enthaeltKlartextKeys: /PPWR-/i.test(String(z || '')),
+          KV_KEYS: env.KEYS ? 'verbunden' : 'nicht verbunden',
+          weitereNamen: Object.keys(env).filter((k) => /key/i.test(k) && !['GEMINI_KEY', 'ZUGANGS_KEYS', 'KEYS'].includes(k)),
+        })
+      }
       if (pathname === '/api/key' && request.method === 'GET') {
         const p = await pruefeKey(request, env)
         if (!p.ok) return json({ gueltig: false, fehler: p.fehler }, p.status)
