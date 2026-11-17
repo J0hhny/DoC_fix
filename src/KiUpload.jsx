@@ -130,8 +130,9 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
 
       {ki.map((x) => {
         const d = x.ergebnis?.dokument || {}
-        const zeilen = (x.ergebnis?.art5 || []).filter((a) => aktiveFelder.has(a.datenfeld))
-        const uebernehmbar = zeilen.filter((a) => a.stufe !== 'S5')
+        // Alle Felder zeigen; nicht benötigte (z. B. PFAS ohne Lebensmittelkontakt) grau und ohne Übernahme.
+        const zeilen = x.ergebnis?.art5 || []
+        const uebernehmbar = zeilen.filter((a) => a.stufe !== 'S5' && aktiveFelder.has(a.datenfeld))
         const blockiert = uebernehmbar.some((a) => x.pruefung?.zitate?.[a.datenfeld] === ZITAT.NICHT_GEFUNDEN)
         const hinweise = [...(x.pruefung?.hinweise || []), ...(x.ergebnis?.hinweise || [])]
         return (
@@ -157,9 +158,11 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                       const zk = `${x.sha}:${a.datenfeld}`
                       const z = zahlen[zk] || zahlAusText(a.aussage || a.zitat)
                       return (
-                        <tr key={a.datenfeld}>
-                          <td>{felder.find((f) => f.id === a.datenfeld)?.bezeichnung || a.datenfeld}
-                            <div className="klein">erfüllt ab {abStufe({ id: a.datenfeld })}</div></td>
+                        <tr key={a.datenfeld} className={aktiveFelder.has(a.datenfeld) ? '' : 'inaktiv'}>
+                          <td>{FELD_NAME[a.datenfeld] || a.datenfeld}
+                            <div className="klein">{aktiveFelder.has(a.datenfeld)
+                              ? `erfüllt ab ${abStufe({ id: a.datenfeld })}`
+                              : a.datenfeld === 'df1' ? 'für diese Verpackung derzeit nicht nötig' : 'nur bei Lebensmittelkontakt nötig (Profil)'}</div></td>
                           <td><strong>{a.stufe}</strong><div className="klein">{STUFE_TEXT[a.stufe]}{a.grundlage && a.grundlage !== 'k. A.' ? ` · ${a.grundlage}` : ''}</div></td>
                           <td>
                             {a.zitat ? <q>{a.zitat}</q> : <span className="klein">—</span>}
@@ -173,7 +176,7 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                             )}
                           </td>
                           <td>
-                            {a.stufe !== 'S5' && (
+                            {a.stufe !== 'S5' && aktiveFelder.has(a.datenfeld) && (
                               <button type="button" className="link" disabled={!gewaehlt(x.sha).size || (a.stufe === 'S1' && !z.wert)}
                                 onClick={() => uebernehmen(x, [a])}>übernehmen</button>
                             )}
@@ -206,4 +209,10 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
   )
 }
 
+const FELD_NAME = {
+  df1: 'Schwermetalle (Summe Pb, Cd, Hg, Cr VI)',
+  df2: 'PFAS — einzelner Stoff (gezielte Analyse)',
+  df3: 'PFAS — Summe (gezielte Analyse)',
+  df4: 'PFAS — gesamt inkl. polymerer',
+}
 const rang = (s) => ['S1', 'S2', 'S3', 'S4', 'S5', 'n. z.'].indexOf(s)

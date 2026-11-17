@@ -273,3 +273,5 @@ button.zweit { background: var(--akzent-hell); color: var(--akzent); }
 .umfang { margin: 0.6rem 0 0; padding: 0.5rem 0.8rem; background: var(--gelb-hell); color: var(--gelb); border-radius: 5px; font-size: 0.88rem; }
 .zugang { display: flex; flex-direction: column; gap: 0.7rem; max-width: 26rem; margin: 2rem 0; }
 .zugang label { font-weight: bold; }
+tr.inaktiv { color: #8a919c; }
+tr.inaktiv strong { font-weight: normal; }
