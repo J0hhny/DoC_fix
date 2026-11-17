@@ -150,6 +150,16 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                 </p>
                 {hinweise.length > 0 && <ul className="kihinweise">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
 
+                {uebernehmbar.length > 0 && (teile.length ? (
+                  <div className="kiziel kiwahl">
+                    <strong>Für welche Bauteile gilt dieses Dokument?</strong>
+                    {teile.map((b) => (
+                      <label key={b.id}>
+                        <input type="checkbox" checked={gewaehlt(x.sha).has(b.id)} onChange={() => bauteilUmschalten(x.sha, b.id)} /> {anzeigeName(b, projekt.bauteile)}
+                      </label>
+                    ))}
+                  </div>
+                ) : <p className="abbruch">Legen Sie unten unter „Bauteile“ zuerst die Bauteile an — dann können Sie die Aussagen zuordnen und übernehmen.</p>)}
                 <table className="messwerte">
                   <thead><tr><th>Feld</th><th>Stufe</th><th>Beleg</th><th></th></tr></thead>
                   <tbody>
@@ -187,19 +197,17 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                   </tbody>
                 </table>
 
-                {uebernehmbar.length > 0 && (teile.length ? (
+                {uebernehmbar.length > 0 && (
                   <div className="kiziel">
-                    <span className="klein">Gilt für:</span>
-                    {teile.map((b) => (
-                      <label key={b.id} className="klein">
-                        <input type="checkbox" checked={gewaehlt(x.sha).has(b.id)} onChange={() => bauteilUmschalten(x.sha, b.id)} /> {anzeigeName(b, projekt.bauteile)}
-                      </label>
-                    ))}
                     <button type="button" className="zweit" disabled={!gewaehlt(x.sha).size || blockiert || uebernehmbar.some((a) => a.stufe === 'S1')}
-                      title={blockiert ? 'Mindestens ein Zitat wurde nicht gefunden — bitte einzeln prüfen und übernehmen.' : ''}
                       onClick={() => uebernehmen(x, uebernehmbar)}>alle bestätigen und übernehmen</button>
+                    <span className="klein">
+                      {!gewaehlt(x.sha).size ? 'Erst oben ein Bauteil anhaken.'
+                        : blockiert ? 'Ein Zitat wurde nicht gefunden — bitte jede Zeile einzeln prüfen und übernehmen.'
+                        : uebernehmbar.some((a) => a.stufe === 'S1') ? 'Enthält einen Messwert — bitte Zahl prüfen und die Zeile einzeln übernehmen.' : ''}
+                    </span>
                   </div>
-                ) : <p className="klein">Legen Sie unten zuerst Bauteile an, dann können Sie die Aussagen zuordnen.</p>)}
+                )}
               </>
             )}
           </div>

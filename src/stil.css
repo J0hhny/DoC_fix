@@ -275,3 +275,4 @@ button.zweit { background: var(--akzent-hell); color: var(--akzent); }
 .zugang label { font-weight: bold; }
 tr.inaktiv { color: #8a919c; }
 tr.inaktiv strong { font-weight: normal; }
+.kiwahl { margin: 0.6rem 0; padding: 0.5rem 0.7rem; background: var(--akzent-hell); border-radius: 5px; }
