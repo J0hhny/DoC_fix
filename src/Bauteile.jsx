@@ -5,7 +5,7 @@
  * Reine Darstellung. Geprüft wird in bauteile.js.
  */
 
-import { anzeigeName, blaetter, EINHEITEN, ERGEBNIS, fmt } from './bauteile.js'
+import { anzeigeName, blaetter, EINHEITEN, ERGEBNIS, fmt, STUFE_TEXT } from './bauteile.js'
 
 const DOKTYPEN = ['Lieferantenerklärung', 'Prüfbericht', 'Analysenzertifikat', 'Spezifikation', 'Konformitätserklärung', 'Sonstiges']
 const neueId = (p) => p + Math.random().toString(36).slice(2, 8)
@@ -74,6 +74,7 @@ export default function Bauteile({ projekt, setProjekt, pruefung, testmodus, bei
                   </label>
                   <input className="eingabe zahl" inputMode="decimal" aria-label={`${f.bezeichnung} — ${anzeigeName(b, bauteile)}`}
                     value={dp.wert ?? ''} onChange={(e) => wertSetze(b.id, f.id, 'wert', e.target.value)} />
+                  {dp.stufe && <div className="klein" title={dp.zitat || ''}>Aussage {dp.stufe} ({STUFE_TEXT[dp.stufe]}){dp.zitatStatus ? ` · Zitat ${dp.zitatStatus}` : ''}</div>}
                 </td>
                 <td>
                   <select value={dp.einheit || f.einheit} onChange={(e) => wertSetze(b.id, f.id, 'einheit', e.target.value)}>

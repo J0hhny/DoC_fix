@@ -257,3 +257,16 @@ button.zweit { background: var(--akzent-hell); color: var(--akzent); }
   .matrix td:last-child { white-space: normal; }
   .abschluss { flex-direction: column; align-items: stretch; }
 }
+
+/* KI-Auslesen (KiUpload.jsx) */
+.ki { margin: 0 0 1.6rem; padding: 0 0 1.2rem; border-bottom: 1px solid var(--linie); }
+.kizeile { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.6rem 0; }
+.ablage { display: block; margin: 0.8rem 0; padding: 1.4rem; text-align: center; border: 2px dashed var(--linie); border-radius: 6px; color: var(--grau); cursor: pointer; }
+.ablage.an { border-color: var(--akzent); background: var(--akzent-hell); }
+.ablage.aus { pointer-events: none; opacity: 0.7; }
+.kikarte { margin: 0.8rem 0; padding: 0.8rem 1rem; border: 1px solid var(--linie); border-radius: 6px; background: #fff; }
+.kikopf { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.kikopf strong { flex: 1; word-break: break-word; }
+.kihinweise { margin: 0.4rem 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--gelb); }
+.kiziel { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem; margin-top: 0.6rem; }
+.kikarte q { font-size: 0.85rem; font-style: italic; }

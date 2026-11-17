@@ -14,6 +14,7 @@ import Block from './Block.jsx'
 import Nachweis from './Nachweis.jsx'
 import { Erklaerung, Lueckenreport, Checkliste, Maengelliste, erklaerungsNummer } from './Dokumente.jsx'
 import Bauteile from './Bauteile.jsx'
+import KiUpload from './KiUpload.jsx'
 import { pruefeBauteile, leeresProjekt, projektExport, projektImport, beispielHonigglas, ERGEBNIS } from './bauteile.js'
 
 const BLOCK_TEXT = {
@@ -181,6 +182,7 @@ export default function App() {
       offen={!!offen[BAUTEIL_BLOCK]} umschalten={() => umschalten(BAUTEIL_BLOCK)}
       gesamt={pruefung.ergebnisse.length} fehlend={offeneBauteilWerte}
       label={projekt.bauteile.length ? null : 'optional'}>
+      <KiUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />
       <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} testmodus={TESTMODUS}
         beispiel={() => setProjekt(beispielHonigglas())} />
     </Block>
