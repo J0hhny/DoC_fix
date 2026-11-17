@@ -22,7 +22,7 @@ export function Ergebnis({ r }) {
   return <span className={'erg ' + ERG_KLASSE[r.ergebnis]} title={r.grund || ''}>{r.ergebnis}</span>
 }
 
-export default function Bauteile({ projekt, setProjekt, pruefung, testmodus, beispiel }) {
+export default function Bauteile({ projekt, setProjekt, pruefung }) {
   const { bauteile, dokumente, werte } = projekt
   const aendern = (f) => setProjekt((p) => f(structuredClone(p)))
 
@@ -126,9 +126,6 @@ export default function Bauteile({ projekt, setProjekt, pruefung, testmodus, bei
         Das Tool prüft jeden Wert gegen den Grenzwert und beantwortet die zugehörigen Prüffragen selbst.
         Fehlende Werte erscheinen im Lückenreport, sortiert nach Lieferant. Ohne Bauteile beantworten Sie die Fragen wie bisher.
       </p>
-      {testmodus && bauteile.length === 0 && (
-        <button type="button" className="zweit" onClick={beispiel}>Testbeispiel Honigglas laden</button>
-      )}
 
       <h3>Dokumente der Lieferanten</h3>
       {dokumente.length === 0 && <p className="klein">Noch keine Dokumente erfasst. Die Dateien selbst werden nicht hochgeladen — nur Name und Datum als Verweis.</p>}

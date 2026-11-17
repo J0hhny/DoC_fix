@@ -215,34 +215,3 @@ export function projektImport(json) {
     projekt: { bauteile: json.bauteile || [], dokumente: json.dokumente || [], werte: json.werte || {}, ki: json.ki || [] },
   }
 }
-
-// ---------------------------------------------------------------- Beispiel (Testmodus)
-
-/** Honigglas: Glas · Deckel (Metall, Innenlack, Dichtung) · Etikett. Werte frei erfunden. */
-export function beispielHonigglas() {
-  const d = (id, name, typ, aussteller, datum) => ({ id, name, typ, aussteller, datum })
-  const w = (wert, einheit, dokument, extra = {}) => ({ wert, einheit, dokument, seite: '1', herkunft: 'hand', bestaetigt: true, ...extra })
-  return {
-    dokumente: [
-      d('dok1', 'Glas_Spezifikation_2026.pdf', 'Spezifikation', 'Glashütte Muster GmbH', '2026-03-02'),
-      d('dok2', 'Deckel_Konformitaet_PPWR.pdf', 'Lieferantenerklärung', 'Verschluss AG', '2026-09-15'),
-      d('dok3', 'Dichtung_PFAS_Analyse.pdf', 'Prüfbericht', 'Labor Nord', '2026-08-20'),
-      d('dok4', 'Etikett_Datenblatt.pdf', 'Spezifikation', 'Etiketten KG', '2025-11-10'),
-    ],
-    bauteile: [
-      { id: 'b1', name: 'Glas', material: 'Glas', lieferant: 'Glashütte Muster GmbH', teilVon: null },
-      { id: 'b2', name: 'Deckel', material: 'Metall', lieferant: 'Verschluss AG', teilVon: null },
-      { id: 'b2a', name: 'Metall', material: 'Weißblech', lieferant: '', teilVon: 'b2' },
-      { id: 'b2b', name: 'Innenlack', material: 'Lack', lieferant: '', teilVon: 'b2' },
-      { id: 'b2c', name: 'Dichtung', material: 'Kunststoff (Compound)', lieferant: '', teilVon: 'b2' },
-      { id: 'b3', name: 'Etikett', material: 'Papier', lieferant: 'Etiketten KG', teilVon: null },
-    ],
-    werte: {
-      b1: { df1: w('12', 'mg/kg', 'dok1'), df2: w('5', 'µg/kg', 'dok1', { kleinerAls: true }), df3: w('20', 'µg/kg', 'dok1', { kleinerAls: true }), df4: w('1', 'mg/kg', 'dok1', { kleinerAls: true }) },
-      b2a: { df1: w('35', 'mg/kg', 'dok2'), df2: w('5', 'µg/kg', 'dok2', { kleinerAls: true }), df3: w('20', 'µg/kg', 'dok2', { kleinerAls: true }), df4: w('1', 'mg/kg', 'dok2', { kleinerAls: true }) },
-      b2b: { df1: w('8', 'mg/kg', 'dok2'), df2: w('5', 'µg/kg', 'dok2', { kleinerAls: true }), df3: w('20', 'µg/kg', 'dok2', { kleinerAls: true }), df4: w('1', 'mg/kg', 'dok2', { kleinerAls: true }) },
-      b2c: { df1: w('4', 'mg/kg', 'dok2'), df2: w('12', 'ppb', 'dok3'), df3: w('48', 'ppb', 'dok3'), df4: w('2', 'ppm', 'dok3') },
-      b3: { df1: w('20', 'mg/kg', 'dok4') },
-    },
-  }
-}

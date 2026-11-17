@@ -16,7 +16,7 @@ import Nachweis from './Nachweis.jsx'
 import { Erklaerung, Lueckenreport, Checkliste, Maengelliste, erklaerungsNummer } from './Dokumente.jsx'
 import Bauteile from './Bauteile.jsx'
 import KiUpload from './KiUpload.jsx'
-import { pruefeBauteile, leeresProjekt, projektExport, projektImport, beispielHonigglas, ERGEBNIS } from './bauteile.js'
+import { pruefeBauteile, leeresProjekt, projektExport, projektImport, ERGEBNIS } from './bauteile.js'
 
 // Prüfumfang der Testversion: src/umfang.js
 const katalog = zuschneiden(katalogVoll)
@@ -187,8 +187,7 @@ export default function App() {
       gesamt={pruefung.ergebnisse.length} fehlend={offeneBauteilWerte}
       label={projekt.bauteile.length ? null : 'optional'}>
       <KiUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />
-      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} testmodus={TESTMODUS}
-        beispiel={() => setProjekt(beispielHonigglas())} />
+      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} testmodus={TESTMODUS} />
     </Block>
   )
 
