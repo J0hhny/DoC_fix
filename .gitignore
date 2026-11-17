@@ -7,3 +7,7 @@ src/katalog.json
 ~$*.xlsx
 .~lock.*
 dist-einzeldatei
+*.local.csv
+*.local.json
+.wrangler
+.dev.vars

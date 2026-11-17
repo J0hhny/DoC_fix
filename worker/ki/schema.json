@@ -1,0 +1,226 @@
+{
+  "type": "object",
+  "properties": {
+    "dokument": {
+      "type": "object",
+      "properties": {
+        "aussteller": {
+          "type": "string",
+          "description": "Firmenname des Ausstellers. 'k. A.' wenn im Dokument nicht genannt."
+        },
+        "ort_aussteller": {
+          "type": "string",
+          "description": "Ort des Ausstellers, bei Ausland mit Land in Klammern. 'k. A.' wenn nicht genannt."
+        },
+        "adressat": {
+          "type": "string",
+          "description": "Firmenname des Empfängers. 'allgemein' bei Rundschreiben an alle Kunden. 'k. A.' wenn nicht erkennbar."
+        },
+        "dokumenttyp": {
+          "type": "string",
+          "enum": [
+            "Konformitätserklärung PPWR",
+            "Lebensmittel-Konformitätserklärung",
+            "Stoff-/PPWR-Statement",
+            "Produktspezifikation",
+            "allgemeines Anschreiben"
+          ]
+        },
+        "datum": {
+          "type": "string",
+          "description": "Ausstellungsdatum als JJJJ-MM-TT, JJJJ-MM oder 'k. A.'"
+        },
+        "gueltig_bis": {
+          "type": "string",
+          "description": "JJJJ-MM-TT oder 'k. A.'"
+        },
+        "sprache": {
+          "type": "string",
+          "enum": [
+            "DE",
+            "EN",
+            "DE/EN"
+          ]
+        },
+        "geltungsbereich": {
+          "type": "string",
+          "enum": [
+            "Artikel",
+            "Produktgruppe",
+            "alle Produkte",
+            "k. A."
+          ]
+        }
+      },
+      "required": [
+        "aussteller",
+        "ort_aussteller",
+        "adressat",
+        "dokumenttyp",
+        "datum",
+        "gueltig_bis",
+        "sprache",
+        "geltungsbereich"
+      ]
+    },
+    "verpackungen": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "bezeichnung": {
+            "type": "string"
+          },
+          "artikelnummer": {
+            "type": "string"
+          },
+          "verpackungsart": {
+            "type": "string",
+            "enum": [
+              "Primär",
+              "Sekundär",
+              "Tertiär",
+              "mehrere",
+              "k. A."
+            ]
+          },
+          "materialien": {
+            "type": "string"
+          },
+          "materialgruppe": {
+            "type": "string",
+            "enum": [
+              "Kunststoff",
+              "Papier/Pappe",
+              "Holz",
+              "Verbund",
+              "Metall",
+              "Glas",
+              "mehrere",
+              "k. A."
+            ]
+          },
+          "lebensmittelkontakt": {
+            "type": "string",
+            "enum": [
+              "ja",
+              "nein",
+              "k. A."
+            ]
+          },
+          "verwendungsbedingungen": {
+            "type": "string"
+          },
+          "mehrweg": {
+            "type": "string",
+            "enum": [
+              "ja",
+              "nein",
+              "k. A."
+            ]
+          },
+          "gewicht": {
+            "type": "string"
+          },
+          "masse": {
+            "type": "string"
+          },
+          "rezyklatanteil": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bezeichnung",
+          "artikelnummer",
+          "verpackungsart",
+          "materialien",
+          "materialgruppe",
+          "lebensmittelkontakt",
+          "verwendungsbedingungen",
+          "mehrweg",
+          "gewicht",
+          "masse",
+          "rezyklatanteil"
+        ]
+      }
+    },
+    "art5": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "properties": {
+          "datenfeld": {
+            "type": "string",
+            "enum": [
+              "df1",
+              "df2",
+              "df3",
+              "df4"
+            ]
+          },
+          "stufe": {
+            "type": "string",
+            "enum": [
+              "S1",
+              "S2",
+              "S3",
+              "S4",
+              "S5",
+              "n. z."
+            ]
+          },
+          "aussage": {
+            "type": "string"
+          },
+          "grundlage": {
+            "type": "string",
+            "enum": [
+              "Analyse",
+              "Verbandsmuster",
+              "Vorlieferant",
+              "k. A."
+            ]
+          },
+          "rechtsbezug": {
+            "type": "string",
+            "enum": [
+              "PPWR",
+              "94/62/EG",
+              "keiner"
+            ]
+          },
+          "seite": {
+            "type": "string"
+          },
+          "zitat": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "datenfeld",
+          "stufe",
+          "aussage",
+          "grundlage",
+          "rechtsbezug",
+          "seite",
+          "zitat"
+        ]
+      }
+    },
+    "hinweise": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "dokument",
+    "verpackungen",
+    "art5",
+    "hinweise"
+  ]
+}
