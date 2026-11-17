@@ -92,6 +92,13 @@ export function lieferantVon(b, bauteile) {
 
 /** Ein Wert gegen ein Datenfeld. */
 export function bewerte(feld, dp) {
+  const r = bewerteOhneAblauf(feld, dp)
+  if (dp?.abgelaufen && (r.ergebnis === ERGEBNIS.ERFUELLT || r.vorlaeufig === ERGEBNIS.ERFUELLT))
+    return { ergebnis: ERGEBNIS.UNKLAR, grund: `Quelldokument abgelaufen${dp.gueltigBis ? ' (gültig bis ' + dp.gueltigBis + ')' : ''} — aktuelle Erklärung beim Lieferanten anfordern` }
+  return r
+}
+
+function bewerteOhneAblauf(feld, dp) {
   // Aussage ohne Zahl (KI oder Hand): nach Stufe. S1 braucht immer eine Zahl.
   if (dp?.stufe && dp.stufe !== 'S1' && zahl(dp.wert) === null) return bewerteStufe(feld, dp)
   const roh = zahl(dp?.wert)

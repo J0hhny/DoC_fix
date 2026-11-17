@@ -86,8 +86,8 @@ export function codePruefungen(ergebnis, seiten, heute = new Date().toISOString(
   else if (scanSeiten > 0) hinweise.push(`${scanSeiten} von ${seiten.length} Seiten eingescannt.`)
 
   const d = ergebnis?.dokument || {}
-  if (ISO.test(d.gueltig_bis || '') && d.gueltig_bis < heute.slice(0, d.gueltig_bis.length))
-    hinweise.push(`Abgelaufen: gültig bis ${d.gueltig_bis}.`)
+  const abgelaufen = ISO.test(d.gueltig_bis || '') && d.gueltig_bis < heute.slice(0, d.gueltig_bis.length)
+  if (abgelaufen) hinweise.push(`Abgelaufen: gültig bis ${d.gueltig_bis}.`)
   if (ISO.test(d.datum || '') && d.datum > heute.slice(0, d.datum.length))
     hinweise.push(`Ausstellungsdatum ${d.datum} liegt in der Zukunft.`)
   if (d.datum && d.gueltig_bis && ISO.test(d.datum) && ISO.test(d.gueltig_bis) && d.gueltig_bis < d.datum)
@@ -98,7 +98,7 @@ export function codePruefungen(ergebnis, seiten, heute = new Date().toISOString(
     zitate[a.datenfeld] = zitatStatus(a.zitat, seiten, scanSeiten || 0)
     if (zitate[a.datenfeld] === ZITAT.NICHT_GEFUNDEN) hinweise.push(`Zitat zu ${a.datenfeld} steht so nicht im Dokument — bitte selbst prüfen.`)
   }
-  return { seiten: seiten?.length ?? null, scanSeiten, zitate, hinweise }
+  return { seiten: seiten?.length ?? null, scanSeiten, zitate, hinweise, abgelaufen }
 }
 
 // ---------------------------------------------------------------- Anfrage an den Worker

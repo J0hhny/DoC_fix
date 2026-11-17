@@ -88,6 +88,8 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
             zitat: a.zitat, zitatStatus: eintrag.pruefung?.zitate?.[a.datenfeld] || '',
             wert: a.stufe === 'S1' ? z.wert : '', einheit: a.stufe === 'S1' ? z.einheit : '', kleinerAls: a.stufe === 'S1' ? z.kleinerAls : false,
             dokument: eintrag.dokId, seite: String(a.seite || ''), herkunft: 'ki', bestaetigt: true,
+            abgelaufen: !!(eintrag.pruefung?.abgelaufen || eintrag.pruefung?.hinweise?.some((h) => h.startsWith('Abgelaufen'))),
+            gueltigBis: eintrag.ergebnis?.dokument?.gueltig_bis || '',
           }
           const staerker = alt && alt.bestaetigt !== false && alt.stufe && rang(alt.stufe) < rang(neu.stufe)
           if (!staerker) b[a.datenfeld] = neu
