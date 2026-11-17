@@ -7,7 +7,8 @@
  */
 
 import { useMemo, useState } from 'react'
-import katalog from './katalog.json'
+import katalogVoll from './katalog.json'
+import { zuschneiden, umfangText } from './umfang.js'
 import { auswerten, bloecke, heute, datumDE, STATUS } from './logik.js'
 import Feld from './Feld.jsx'
 import Block from './Block.jsx'
@@ -17,6 +18,8 @@ import Bauteile from './Bauteile.jsx'
 import KiUpload from './KiUpload.jsx'
 import { pruefeBauteile, leeresProjekt, projektExport, projektImport, beispielHonigglas, ERGEBNIS } from './bauteile.js'
 
+// Prüfumfang der Testversion: src/umfang.js
+const katalog = zuschneiden(katalogVoll)
 const BLOCK_TEXT = {
   Ausstellung: 'Das Datum entscheidet, welche Anforderungen der Verordnung bereits gelten.',
   Profil: 'Diese Angaben steuern, welche Prüffragen für Ihre Verpackung erscheinen.',
@@ -30,6 +33,7 @@ const NACHWEIS_TEXT = 'Liegen die Unterlagen vor, mit denen Sie die Konformität
 const BAUTEIL_BLOCK = 'Bauteile und Messwerte'
 const ANFANGS_OFFEN = ['Ausstellung', 'Profil']
 const TESTMODUS = katalog.modus !== 'produktiv'
+const UMFANG = umfangText()
 
 const datumsFrage = katalog.fragen.find((f) => f.typ === 'datum' && f.block === 'Ausstellung')
 const artikelNachId = new Map(katalog.artikel.map((a) => [a.id, a]))
@@ -219,6 +223,7 @@ export default function App() {
       <header className="kopf">
         <p className="marke">DoC_fix</p>
         <h1>Konformitätserklärung für Verpackungen</h1>
+        {UMFANG && <p className="umfang">{UMFANG}</p>}
         <p className="unter">nach Art. 39 und Anhang VIII der Verordnung (EU) 2025/40 (PPWR)</p>
       </header>
 

@@ -6,6 +6,7 @@ export default defineConfig({
   // Relative Pfade: die gebaute Version laeuft dadurch auch dann,
   // wenn man sie ohne Webserver direkt aus einem Ordner oeffnet.
   base: './',
+  define: { __EINZELDATEI__: JSON.stringify(!!process.env.EINZELDATEI) },
   // Lokal: /api an den Worker weiterleiten (npx wrangler dev läuft auf Port 8787).
   server: { proxy: { '/api': 'http://localhost:8787' } },
   build: process.env.EINZELDATEI

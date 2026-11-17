@@ -270,3 +270,6 @@ button.zweit { background: var(--akzent-hell); color: var(--akzent); }
 .kihinweise { margin: 0.4rem 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--gelb); }
 .kiziel { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem; margin-top: 0.6rem; }
 .kikarte q { font-size: 0.85rem; font-style: italic; }
+.umfang { margin: 0.6rem 0 0; padding: 0.5rem 0.8rem; background: var(--gelb-hell); color: var(--gelb); border-radius: 5px; font-size: 0.88rem; }
+.zugang { display: flex; flex-direction: column; gap: 0.7rem; max-width: 26rem; margin: 2rem 0; }
+.zugang label { font-weight: bold; }

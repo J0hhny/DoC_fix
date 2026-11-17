@@ -51,7 +51,9 @@ async function pruefeKey(request, env) {
     return { ok: true, hash, eintrag, rest }
   }
 
-  const liste = (env.ZUGANGS_KEYS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+  // Alle 64-stelligen Hashes aus dem Secret lesen — egal ob mit Kommas, Zeilenumbrüchen oder Begleittext eingefügt.
+  const liste = (env.ZUGANGS_KEYS || '').toLowerCase().match(/[0-9a-f]{64}/g) || []
+  if (!liste.length) return { ok: false, status: 500, fehler: 'Server: keine Zugangs-Keys eingerichtet (Secret ZUGANGS_KEYS fehlt oder ist leer).' }
   if (liste.includes(hash)) return { ok: true, hash, eintrag: null, rest: null }
   return { ok: false, status: 401, fehler: 'Zugangs-Key ungültig.' }
 }

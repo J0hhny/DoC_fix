@@ -1,10 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import Zugang from './Zugang.jsx'
 import './stil.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <Zugang>
+      <App />
+    </Zugang>
   </React.StrictMode>,
 )

@@ -6,6 +6,7 @@
  * Layout folgt dem abgenommenen Muster 3_Umsetzung/drucktest-anhang-viii.html.
  */
 
+import { umfangText } from '../umfang.js'
 import { Document, Page, View, Text, StyleSheet, Font, Svg, Polyline } from '@react-pdf/renderer'
 import { datumDE, STATUS } from '../logik.js'
 import {
@@ -152,10 +153,11 @@ function Kaestchen({ an }) {
 }
 
 function Hinweis({ testmodus }) {
+  const umfang = umfangText()
   return (
     <View style={s.disclaimer} wrap={false}>
       <Text style={[s.fett, { marginBottom: 2 }]}>Hinweis</Text>
-      <Text>{DISCLAIMER}{testmodus ? <Text style={s.testvermerk}> Interne Testversion — nicht zur Verwendung bestimmt.</Text> : null}</Text>
+      <Text>{DISCLAIMER}{testmodus ? <Text style={s.testvermerk}> Interne Testversion — nicht zur Verwendung bestimmt.</Text> : null}{umfang ? <Text style={s.testvermerk}> {umfang}</Text> : null}</Text>
     </View>
   )
 }

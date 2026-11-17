@@ -5,17 +5,18 @@
  * wird je Datenfeld auf die gewählten Bauteile, als bestätigter Datenpunkt mit
  * Stufe, Zitat und Quelldokument. Danach rechnen die Regeln aus bauteile.js.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { anzeigeName, blaetter, STUFE_TEXT, abStufe } from './bauteile.js'
-import { keyLaden, keyMerken, keyPruefen, verarbeite, ZITAT, zahlAusText } from './ki.js'
+import { keyLaden, keyPruefen, verarbeite, ZITAT, zahlAusText } from './ki.js'
 
 const STATUS_TEXT = { wartet: 'wartet', 'läuft': 'wird gelesen …', fertig: 'fertig', fehler: 'Fehler', bekannt: 'schon gelesen' }
 const ZITAT_KLASSE = { [ZITAT.GEFUNDEN]: 'erg-ok', [ZITAT.NICHT_GEFUNDEN]: 'erg-nein', [ZITAT.SCAN]: 'erg-unklar' }
 const kosten = (t) => (t ? (t.ein * 0.5 + (t.aus + t.denken) * 3) / 1e6 : 0) // grobe Schätzung in $, nur zur Orientierung
 
 export default function KiUpload({ projekt, setProjekt, felder }) {
-  const [key, setKey] = useState(keyLaden)
+  const key = keyLaden() // aus der Anmeldung (Zugang.jsx)
   const [keyStand, setKeyStand] = useState(null)
+  useEffect(() => { keyPruefen(key).then(setKeyStand).catch(() => setKeyStand({ gueltig: false, fehler: 'Server nicht erreichbar.' })) }, [])
   const [laeuft, setLaeuft] = useState(false)
   const [ziehen, setZiehen] = useState(false)
   const [auswahl, setAuswahl] = useState({}) // sha → Set(bauteilId)
@@ -25,12 +26,6 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
   const aktiveFelder = new Set(felder.map((f) => f.id))
 
   const aendern = (f) => setProjekt((p) => f(structuredClone(p)))
-
-  async function keyBestaetigen() {
-    keyMerken(key.trim())
-    setKeyStand({ pruefe: true })
-    try { setKeyStand(await keyPruefen(key.trim())) } catch { setKeyStand({ gueltig: false, fehler: 'Server nicht erreichbar.' }) }
-  }
 
   /** Eintrag in projekt.ki einfügen oder ersetzen; fertige Dokumente bekommen einen Eintrag in projekt.dokumente. */
   function melde(e) {
@@ -62,10 +57,10 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
     setLaeuft(true)
     try {
       const bekannt = new Set(ki.filter((x) => x.status === 'fertig').map((x) => x.sha))
-      await verarbeite(pdfs, key.trim(), bekannt, melde)
+      await verarbeite(pdfs, key, bekannt, melde)
     } finally {
       setLaeuft(false)
-      keyPruefen(key.trim()).then(setKeyStand).catch(() => {})
+      keyPruefen(key).then(setKeyStand).catch(() => {})
     }
   }
 
@@ -113,15 +108,9 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
         Die Dateien werden nicht gespeichert. Jeder Vorschlag muss von Ihnen bestätigt werden, bevor er zählt.
       </p>
 
-      <div className="kizeile">
-        <input className="eingabe kurz" placeholder="Zugangs-Key, z. B. PPWR-…" value={key}
-          onChange={(e) => { setKey(e.target.value); setKeyStand(null) }} />
-        <button type="button" className="zweit" onClick={keyBestaetigen} disabled={!key.trim()}>Key prüfen</button>
-        {keyStand?.pruefe && <span className="klein">prüfe …</span>}
-        {keyStand && !keyStand.pruefe && (keyStand.gueltig
-          ? <span className="erg erg-ok">gültig{keyStand.rest != null ? ` · noch ${keyStand.rest} Dokumente` : ''}</span>
-          : <span className="erg erg-nein">{keyStand.fehler || 'ungültig'}</span>)}
-      </div>
+      {keyStand && (keyStand.gueltig
+        ? keyStand.rest != null && <p className="klein">Ihr Key: noch {keyStand.rest} Dokumente.</p>
+        : <p className="abbruch">{keyStand.fehler || 'Zugangs-Key ungültig.'}</p>)}
 
       {keyStand?.gueltig && (
         <label className={'ablage' + (ziehen ? ' an' : '') + (laeuft ? ' aus' : '')}
