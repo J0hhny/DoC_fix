@@ -108,6 +108,17 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
         Die KI liest aus jedem PDF, was der Lieferant zu Art. 5 bestätigt und wie stark diese Aussage ist.
         Die Dateien werden nicht gespeichert. Jeder Vorschlag muss von Ihnen bestätigt werden, bevor er zählt.
       </p>
+      <details className="stufeninfo">
+        <summary>Was bedeuten die Stufen S1–S5?</summary>
+        <p className="klein">Die Stufe sagt, wie belastbar die Aussage des Lieferanten ist. Als erfüllt zählt eine Aussage ab Stufe {abStufe({ id: 'df1' })}.</p>
+        <table>
+          <tbody>
+            {Object.entries(STUFE_BEISPIEL).map(([s, b]) => (
+              <tr key={s}><td><strong>{s}</strong></td><td>{STUFE_TEXT[s]}</td><td className="klein">z. B. {b}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
 
       {keyStand && (keyStand.gueltig
         ? keyStand.rest != null && <p className="klein">Ihr Key: noch {keyStand.rest} Dokumente.</p>
@@ -218,6 +229,14 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
   )
 }
 
+const STUFE_BEISPIEL = {
+  S1: '„Summe Schwermetalle: 38 mg/kg“',
+  S2: '„laut Laboranalyse unter 100 mg/kg“',
+  S3: '„wir bestätigen die Einhaltung (laut Vorlieferanten)“',
+  S4: '„PFAS werden nicht bewusst zugesetzt“',
+  S5: 'Dokument sagt nichts dazu',
+  'n. z.': '„für Glas nicht zutreffend“',
+}
 const FELD_NAME = {
   df1: 'Schwermetalle (Summe Pb, Cd, Hg, Cr VI)',
   df2: 'PFAS — einzelner Stoff (gezielte Analyse)',

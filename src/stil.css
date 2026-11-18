@@ -285,3 +285,7 @@ tr.inaktiv strong { font-weight: normal; }
 .quelle { max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bestaetigung { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
 .bestaetigung.offen { color: var(--rot); }
+.stufeninfo { margin: 0.4rem 0 0.8rem; font-size: 0.9rem; }
+.stufeninfo summary { cursor: pointer; color: var(--akzent); }
+.stufeninfo table { border-collapse: collapse; margin-top: 0.4rem; }
+.stufeninfo td { padding: 0.2rem 0.6rem 0.2rem 0; vertical-align: top; }
