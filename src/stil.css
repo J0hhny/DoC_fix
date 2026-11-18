@@ -276,3 +276,12 @@ button.zweit { background: var(--akzent-hell); color: var(--akzent); }
 tr.inaktiv { color: #8a919c; }
 tr.inaktiv strong { font-weight: normal; }
 .kiwahl { margin: 0.6rem 0; padding: 0.5rem 0.7rem; background: var(--akzent-hell); border-radius: 5px; }
+.vorlage { margin: 0.5rem 0 1rem; padding: 0.7rem 0.9rem; background: var(--akzent-hell); border-radius: 5px; }
+.vorlage p { margin: 0 0 0.5rem; }
+.bauteile h3 { margin-top: 1.6rem; }
+.handeingabe { margin-top: 1.2rem; }
+.handeingabe summary { cursor: pointer; color: var(--grau); }
+.uebersicht td { vertical-align: top; }
+.quelle { max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bestaetigung { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
+.bestaetigung.offen { color: var(--rot); }

@@ -51,9 +51,32 @@ export const STUFE_TEXT = {
 }
 /**
  * Ab welcher Stufe ein Feld als erfüllt gilt (O25, Vorschlag bis zum Fachreview):
- * Schwermetalle ab S3, PFAS nur S1–S2. Später als Spalte im Blatt Datenfelder.
+ * Seit 18.11.2026 für alle Felder ab S3 (Entscheidung Johnny; vorher PFAS S2). Später als Spalte im Blatt Datenfelder.
  */
-export const AB_STUFE_STANDARD = { df1: 'S3', df2: 'S2', df3: 'S2', df4: 'S2' }
+export const AB_STUFE_STANDARD = { df1: 'S3', df2: 'S3', df3: 'S3', df4: 'S3' }
+
+// ---------------------------------------------------------------- Vorlagen für die Stückliste
+
+/** Typische Bauteile je Hauptmaterial (Profilfrage p2). [Name, Material, [Unterbauteile]] */
+export const VORLAGEN = {
+  Glas: [['Glas', 'Glas'], ['Deckel', 'Metall', [['Metall', 'Weißblech'], ['Innenlack', 'Lack'], ['Dichtung', 'Compound']]], ['Etikett', 'Papier oder Folie']],
+  Kunststoff: [['Behälter', 'Kunststoff'], ['Verschluss', 'Kunststoff', [['Verschluss', 'Kunststoff'], ['Dichtung', 'Kunststoff']]], ['Etikett', 'Papier oder Folie']],
+  Metall: [['Dose', 'Metall', [['Metall', 'Weißblech/Aluminium'], ['Innenlack', 'Lack']]], ['Deckel', 'Metall', [['Metall', 'Weißblech/Aluminium'], ['Innenlack', 'Lack'], ['Dichtung', 'Compound']]], ['Etikett / Druck', 'Papier oder Druckfarbe']],
+  'Papier/Karton': [['Faltschachtel', 'Karton', [['Karton', 'Papier/Karton'], ['Druckfarbe', 'Farbe'], ['Lack / Beschichtung', 'Lack']]], ['Klebstoff', 'Klebstoff']],
+  Verbund: [['Verbundmaterial', 'Verbund', [['Außenschicht', 'Folie/Papier'], ['Barriereschicht', 'Aluminium/EVOH'], ['Siegelschicht', 'Kunststoff']]], ['Verschluss', 'Kunststoff'], ['Druckfarbe', 'Farbe']],
+  Holz: [['Holzteil', 'Holz'], ['Befestigung', 'Metall'], ['Etikett', 'Papier']],
+}
+
+export function vorlageBauteile(material) {
+  const id = () => 'b' + Math.random().toString(36).slice(2, 8)
+  const out = []
+  for (const [name, mat, kinder] of VORLAGEN[material] || []) {
+    const b = { id: id(), name, material: mat, lieferant: '', teilVon: null }
+    out.push(b)
+    for (const [kn, km] of kinder || []) out.push({ id: id(), name: kn, material: km, lieferant: '', teilVon: b.id })
+  }
+  return out
+}
 export const abStufe = (feld) => feld.abStufe || AB_STUFE_STANDARD[feld.id] || 'S2'
 const rang = (s) => ['S1', 'S2', 'S3', 'S4', 'S5'].indexOf(s)
 

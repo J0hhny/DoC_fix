@@ -30,9 +30,10 @@ const BLOCK_TEXT = {
 }
 const NACHWEIS_BLOCK = 'Technische Dokumentation'
 const NACHWEIS_TEXT = 'Liegen die Unterlagen vor, mit denen Sie die Konformität belegen? Die Abfrage richtet sich nach den Anforderungen, die Sie oben als erfüllt angegeben haben. Fehlende Nachweise blockieren die Erklärung nicht, sie erscheinen im Lückenreport.'
-const BAUTEIL_BLOCK = 'Bauteile und Messwerte'
+const BAUTEIL_BLOCK = 'Bauteile und Lieferantenunterlagen'
 // Blöcke, die abweichend von der Excel-Reihenfolge ganz an den Anfang gehören (Erzeugerdaten = einmal eingeben, für alle Erklärungen gleich)
 const ZUERST = ['Erzeuger']
+const BESTAETIGT = '__weitereNachweise'
 const ANFANGS_OFFEN = ['Erzeuger', 'Ausstellung', 'Profil']
 const TESTMODUS = katalog.modus !== 'produktiv'
 const UMFANG = umfangText()
@@ -65,6 +66,10 @@ export default function App() {
     const e0 = auswerten(katalog, antworten, nachweise)
     const pruefung = pruefeBauteile(katalog, e0, projekt)
     const aEff = { ...antworten, ...pruefung.antworten }
+    // Unterlagen unvollständig + Selbstauskunft „Ja“: zählt nur mit Bestätigung weiterer Nachweise, sonst bleibt die Frage offen.
+    for (const [id, d] of Object.entries(pruefung.details)) {
+      if (!d.wert && aEff[id] === 'ja' && !antworten[id + BESTAETIGT]) delete aEff[id]
+    }
     const nEff = { ...nachweise, ...pruefung.nachweise }
     return { e: auswerten(katalog, aEff, nEff), pruefung, aEff, nEff }
   }, [antworten, nachweise, projekt])
@@ -187,12 +192,12 @@ export default function App() {
 
   const offeneBauteilWerte = pruefung.ergebnisse.filter((r) => r.ergebnis !== ERGEBNIS.ERFUELLT && r.ergebnis !== ERGEBNIS.NICHT_ERFUELLT).length
   const bauteilBlock = (
-    <Block key={BAUTEIL_BLOCK} titel={BAUTEIL_BLOCK + ' — Daten aus Lieferantenunterlagen'}
+    <Block key={BAUTEIL_BLOCK} titel={BAUTEIL_BLOCK}
       offen={!!offen[BAUTEIL_BLOCK]} umschalten={() => umschalten(BAUTEIL_BLOCK)}
       gesamt={pruefung.ergebnisse.length} fehlend={offeneBauteilWerte}
       label={projekt.bauteile.length ? null : 'optional'}>
-      <KiUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />
-      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} testmodus={TESTMODUS} />
+      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} material={aEff.p2}
+        upload={<KiUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />} />
     </Block>
   )
 
@@ -207,9 +212,9 @@ export default function App() {
         spaeterAb={b.fragen.every((f) => e.kategorie(f) === 'später') ? e.giltAbFuer(b.fragen[0]) : null}>
         {b.fragen.map((f) => {
           const spaeter = e.kategorie(f) === 'später'
-          return <Feld key={f.id} frage={f} wert={aEff[f.id]} setze={setze}
+          return <Feld key={f.id} frage={f} wert={aEff[f.id] ?? antworten[f.id]} setze={setze}
             fehlt={!spaeter && !e.beantwortet(f)} spaeter={spaeter ? e.giltAbFuer(f) : null}
-            abgeleitet={pruefung.details[f.id]} />
+            abgeleitet={pruefung.details[f.id]} weitereNachweise={!!antworten[f.id + BESTAETIGT]} setzeWeitere={(v) => setze(f.id + BESTAETIGT, v)} />
         })}
       </Block>,
     )

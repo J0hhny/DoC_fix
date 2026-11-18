@@ -1,11 +1,13 @@
 /**
- * Eingabe der Bauteildaten: Dokumente · Bauteile (eine Ebene Unterbauteile)
- * · Messwerte je Bauteil und aktivem Datenfeld mit Ergebnis.
+ * Bauteile und Lieferantenunterlagen in drei Schritten:
+ *   1. Bauteile festlegen (Vorlage je Hauptmaterial oder frei)
+ *   2. Unterlagen hochladen und zuordnen (KiUpload, als upload übergeben)
+ *   3. Ergebnis je Bauteil — Handeingabe nur zugeklappt für Ausnahmen
  *
  * Reine Darstellung. Geprüft wird in bauteile.js.
  */
 
-import { anzeigeName, blaetter, EINHEITEN, ERGEBNIS, fmt, STUFE_TEXT } from './bauteile.js'
+import { anzeigeName, blaetter, EINHEITEN, ERGEBNIS, fmt, STUFE_TEXT, VORLAGEN, vorlageBauteile } from './bauteile.js'
 
 const DOKTYPEN = ['Lieferantenerklärung', 'Prüfbericht', 'Analysenzertifikat', 'Spezifikation', 'Konformitätserklärung', 'Sonstiges']
 const neueId = (p) => p + Math.random().toString(36).slice(2, 8)
@@ -22,7 +24,7 @@ export function Ergebnis({ r }) {
   return <span className={'erg ' + ERG_KLASSE[r.ergebnis]} title={r.grund || ''}>{r.ergebnis}</span>
 }
 
-export default function Bauteile({ projekt, setProjekt, pruefung }) {
+export default function Bauteile({ projekt, setProjekt, pruefung, material, upload }) {
   const { bauteile, dokumente, werte } = projekt
   const aendern = (f) => setProjekt((p) => f(structuredClone(p)))
 
@@ -51,7 +53,6 @@ export default function Bauteile({ projekt, setProjekt, pruefung }) {
   })
 
   const oben = bauteile.filter((b) => !b.teilVon)
-  const blattIds = new Set(blaetter(bauteile).map((b) => b.id))
 
   function messwerte(b) {
     if (!pruefung.felder.length) return <p className="klein">Für diese Verpackung sind zurzeit keine Messwerte nötig.</p>
@@ -112,37 +113,91 @@ export default function Bauteile({ projekt, setProjekt, pruefung }) {
           <input className="eingabe" placeholder={b.teilVon ? 'Lieferant (leer = wie übergeordnet)' : 'Lieferant'} value={b.lieferant} onChange={(e) => btSetze(b.id, 'lieferant', e.target.value)} />
           <button type="button" className="link warn" onClick={() => btWeg(b.id)}>entfernen</button>
         </div>
-        {blattIds.has(b.id) ? messwerte(b) : <p className="klein">Messwerte werden bei den Unterbauteilen erfasst.</p>}
         {kinder.map(bauteilKarte)}
         {!b.teilVon && <button type="button" className="link" onClick={() => btNeu(b.id)}>+ Unterbauteil (z. B. Dichtung, Innenlack)</button>}
       </div>
     )
   }
 
+  const teile = blaetter(bauteile)
+  const vorlage = VORLAGEN[material]
+  const vorlageText = vorlage?.map(([n, , k]) => (k ? `${n} (${k.map((x) => x[0]).join(', ')})` : n)).join(' · ')
+  const dokName = (id) => dokumente.find((d) => d.id === id)?.name || ''
+
   return (
     <div className="bauteile">
       <p className="blocktext">
-        Optional. Erfassen Sie die Einzelteile Ihrer Verpackung und die Werte aus den Unterlagen Ihrer Lieferanten.
-        Das Tool prüft jeden Wert gegen den Grenzwert und beantwortet die zugehörigen Prüffragen selbst.
-        Fehlende Werte erscheinen im Lückenreport, sortiert nach Lieferant. Ohne Bauteile beantworten Sie die Fragen wie bisher.
+        So gehen Sie vor: <strong>1.</strong> Bauteile Ihrer Verpackung festlegen · <strong>2.</strong> Unterlagen Ihrer Lieferanten hochladen
+        und den Bauteilen zuordnen · <strong>3.</strong> Ergebnis prüfen. Das Tool beantwortet die Prüffragen zu Art. 5 dann selbst;
+        Lücken erscheinen im Lückenreport beim jeweiligen Lieferanten. Optional — ohne Bauteile beantworten Sie die Fragen selbst.
       </p>
 
-      <h3>Dokumente der Lieferanten</h3>
-      {dokumente.length === 0 && <p className="klein">Noch keine Dokumente erfasst. Die Dateien selbst werden nicht hochgeladen — nur Name und Datum als Verweis.</p>}
-      {dokumente.map((d) => (
-        <div key={d.id} className="dokzeile">
-          <input className="eingabe" placeholder="Dateiname oder Titel" value={d.name} onChange={(e) => dokSetze(d.id, 'name', e.target.value)} />
-          <select value={d.typ} onChange={(e) => dokSetze(d.id, 'typ', e.target.value)}>{DOKTYPEN.map((t) => <option key={t}>{t}</option>)}</select>
-          <input className="eingabe" placeholder="Aussteller" value={d.aussteller} onChange={(e) => dokSetze(d.id, 'aussteller', e.target.value)} />
-          <input className="eingabe" type="date" value={d.datum} onChange={(e) => dokSetze(d.id, 'datum', e.target.value)} />
-          <button type="button" className="link warn" onClick={() => dokWeg(d.id)}>entfernen</button>
+      <h3>1. Bauteile Ihrer Verpackung</h3>
+      {bauteile.length === 0 && (vorlage ? (
+        <div className="vorlage">
+          <p>Vorschlag für eine Verpackung aus <strong>{material}</strong>: {vorlageText}</p>
+          <button type="button" onClick={() => aendern((p) => { p.bauteile = vorlageBauteile(material); return p })}>Vorschlag übernehmen</button>
+          <span className="klein"> Danach können Sie Bauteile umbenennen, entfernen oder ergänzen.</span>
         </div>
-      ))}
-      <button type="button" className="link" onClick={dokNeu}>+ Dokument</button>
-
-      <h3>Bauteile</h3>
+      ) : <p className="klein">Tipp: Wählen Sie im Profil das Hauptmaterial — dann schlagen wir Ihnen passende Bauteile vor.</p>)}
       {oben.map(bauteilKarte)}
       <button type="button" className="link" onClick={() => btNeu()}>+ Bauteil</button>
+
+      <h3>2. Unterlagen der Lieferanten hochladen und zuordnen</h3>
+      {upload}
+
+      <h3>3. Ergebnis je Bauteil</h3>
+      {!teile.length || !pruefung.felder.length ? (
+        <p className="klein">{!teile.length ? 'Noch keine Bauteile.' : 'Für diese Verpackung sind zurzeit keine Angaben nötig.'}</p>
+      ) : (
+        <table className="messwerte uebersicht">
+          <thead><tr><th>Bauteil</th>{pruefung.felder.map((f) => <th key={f.id}>{KURZ[f.id] || f.bezeichnung}</th>)}</tr></thead>
+          <tbody>
+            {teile.map((b) => (
+              <tr key={b.id}>
+                <td>{anzeigeName(b, bauteile)}<div className="klein">{b.lieferant || bauteile.find((x) => x.id === b.teilVon)?.lieferant || 'Lieferant offen'}</div></td>
+                {pruefung.felder.map((f) => {
+                  const r = pruefung.ergebnisse.find((x) => x.bauteil.id === b.id && x.feld.id === f.id)
+                  const dp = werte[b.id]?.[f.id]
+                  return (
+                    <td key={f.id}>
+                      {r && <Ergebnis r={r} />}
+                      {dp?.stufe && <div className="klein">{dp.stufe}{dp.wert ? ` · ${dp.kleinerAls ? '< ' : ''}${dp.wert} ${dp.einheit || ''}` : ''}</div>}
+                      {dp?.dokument && <div className="klein quelle" title={dokName(dp.dokument)}>{dokName(dp.dokument)}</div>}
+                      {r?.grund && <div className="klein">{r.grund}</div>}
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {teile.length > 0 && (
+        <details className="handeingabe">
+          <summary>Werte von Hand eintragen (nur für Ausnahmen, z. B. Angaben per E-Mail ohne PDF)</summary>
+          <h4>Dokumente ohne Upload</h4>
+          {dokumente.map((d) => (
+            <div key={d.id} className="dokzeile">
+              <input className="eingabe" placeholder="Dateiname oder Titel" value={d.name} onChange={(e) => dokSetze(d.id, 'name', e.target.value)} />
+              <select value={d.typ} onChange={(e) => dokSetze(d.id, 'typ', e.target.value)}>{[...new Set([...DOKTYPEN, d.typ])].map((t) => <option key={t}>{t}</option>)}</select>
+              <input className="eingabe" placeholder="Aussteller" value={d.aussteller} onChange={(e) => dokSetze(d.id, 'aussteller', e.target.value)} />
+              <input className="eingabe" type="date" value={d.datum} onChange={(e) => dokSetze(d.id, 'datum', e.target.value)} />
+              <button type="button" className="link warn" onClick={() => dokWeg(d.id)}>entfernen</button>
+            </div>
+          ))}
+          <button type="button" className="link" onClick={dokNeu}>+ Dokument</button>
+          {teile.map((b) => (
+            <div key={b.id} className="handbauteil">
+              <h4>{anzeigeName(b, bauteile)}</h4>
+              {messwerte(b)}
+            </div>
+          ))}
+        </details>
+      )}
     </div>
   )
 }
+
+const KURZ = { df1: 'Schwermetalle', df2: 'PFAS einzeln', df3: 'PFAS Summe', df4: 'PFAS gesamt' }

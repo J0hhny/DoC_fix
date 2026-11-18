@@ -5,7 +5,7 @@
 import { datumDE } from './logik.js'
 import { Herleitung } from './Herleitung.jsx'
 
-export default function Feld({ frage: f, wert, setze, fehlt, spaeter, abgeleitet }) {
+export default function Feld({ frage: f, wert, setze, fehlt, spaeter, abgeleitet, weitereNachweise, setzeWeitere }) {
   const name = 'f_' + f.id
   const zusatz = (
     <>
@@ -81,8 +81,15 @@ export default function Feld({ frage: f, wert, setze, fehlt, spaeter, abgeleitet
       {eingabe}
       {abgeleitet && !abgeleitet.wert && (
         <div className="teilweise">
-          <p>Bauteildaten unvollständig — bitte selbst beantworten. Die fehlenden Werte stehen im Lückenreport beim jeweiligen Lieferanten.</p>
+          <p>Die Lieferantenunterlagen belegen diese Anforderung nicht vollständig. Die fehlenden Angaben stehen im Lückenreport beim jeweiligen Lieferanten.</p>
           <Herleitung eintraege={abgeleitet.eintraege} />
+          {wert === 'ja' && (
+            <label className={'bestaetigung' + (weitereNachweise ? '' : ' offen')}>
+              <input type="checkbox" checked={!!weitereNachweise} onChange={(e) => setzeWeitere(e.target.checked)} />
+              {' '}Ich bestätige, dass mir weitere Nachweise vorliegen, die diese Lücken schließen.
+              {!weitereNachweise && <span className="klein"> Ohne diese Bestätigung zählt die Frage als offen.</span>}
+            </label>
+          )}
         </div>
       )}
       {(f.erklaerung || f.fundstelle) && (

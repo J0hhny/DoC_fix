@@ -104,7 +104,6 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
 
   return (
     <div className="ki">
-      <h3>Lieferantendokumente automatisch auslesen</h3>
       <p className="klein">
         Die KI liest aus jedem PDF, was der Lieferant zu Art. 5 bestätigt und wie stark diese Aussage ist.
         Die Dateien werden nicht gespeichert. Jeder Vorschlag muss von Ihnen bestätigt werden, bevor er zählt.
@@ -161,7 +160,7 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                       </label>
                     ))}
                   </div>
-                ) : <p className="abbruch">Legen Sie unten unter „Bauteile“ zuerst die Bauteile an — dann können Sie die Aussagen zuordnen und übernehmen.</p>)}
+                ) : <p className="abbruch">Legen Sie oben unter 1. zuerst die Bauteile an — dann können Sie die Aussagen zuordnen und übernehmen.</p>)}
                 <table className="messwerte">
                   <thead><tr><th>Feld</th><th>Stufe</th><th>Beleg</th><th></th></tr></thead>
                   <tbody>
