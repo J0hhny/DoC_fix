@@ -285,7 +285,7 @@ export default function App() {
         Die mit diesem Tool erstellte Konformitätserklärung ist ein Entwurf auf Basis Ihrer Angaben. Sie stellt
         keine Rechtsberatung dar und begründet keine Gewähr für die rechtliche Konformität der Verpackung. Die
         alleinige Verantwortung für die Ausstellung der Konformitätserklärung trägt der Erzeuger (Anhang VIII
-        Nr. 3 der Verordnung (EU) 2025/40). Ihre Eingaben verlassen Ihren Browser nicht und werden nicht gespeichert.
+        Nr. 3 der Verordnung (EU) 2025/40). Ihre Eingaben bleiben in Ihrem Browser. Hochgeladene Lieferantendokumente werden zum Auslesen an einen KI-Dienst (Google Gemini) übermittelt; wir speichern sie nicht.
       </footer>
     </div>
   )

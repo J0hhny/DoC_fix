@@ -33,3 +33,10 @@ export function umfangText() {
   const namen = [...new Set(AKTIVE_ARTIKEL.map((id) => 'Art. ' + id.match(/^art(\d+)/)[1]))]
   return `Eingeschränkter Prüfumfang: geprüft wird nur ${namen.join(', ')}. Weitere Anforderungen der Verordnung (EU) 2025/40 sind in dieser Version nicht enthalten.`
 }
+
+/** Welche Artikel die Erklärung in Punkt 5 nennt: „5 bis 12“ in der vollen Version, sonst nur die geprüften. */
+export function artikelInErklaerung() {
+  if (!AKTIVE_ARTIKEL) return 'Artikel 5 bis 12'
+  const nr = [...new Set(AKTIVE_ARTIKEL.map((id) => Number(id.match(/^art(\d+)/)[1])))].sort((a, b) => a - b)
+  return nr.length === 1 ? `Artikel ${nr[0]}` : `Artikel ${nr.slice(0, -1).join(', ')} und ${nr[nr.length - 1]}`
+}

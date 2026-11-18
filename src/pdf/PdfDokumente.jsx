@@ -6,7 +6,7 @@
  * Layout folgt dem abgenommenen Muster 3_Umsetzung/drucktest-anhang-viii.html.
  */
 
-import { umfangText } from '../umfang.js'
+import { umfangText, artikelInErklaerung } from '../umfang.js'
 import { Document, Page, View, Text, StyleSheet, Font, Svg, Polyline } from '@react-pdf/renderer'
 import { datumDE, STATUS } from '../logik.js'
 import {
@@ -193,7 +193,7 @@ export function ErklaerungPdf({ katalog, a, e, nummer, testmodus }) {
 
       <Abschnitt nr="5." titel="Konformität mit den einschlägigen Rechtsvorschriften der Union">
         <Text style={s.abstand}>
-          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der Artikel 5 bis 12 der <Text style={s.fett}>Verordnung (EU) 2025/40</Text>, soweit
+          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der {artikelInErklaerung()} der <Text style={s.fett}>Verordnung (EU) 2025/40</Text>, soweit
           sie zum Ausstellungsdatum gelten{rechtsakte.length ? `, sowie: ${rechtsakte.join('; ')}` : ''}.
         </Text>
         <Tabelle

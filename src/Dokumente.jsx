@@ -6,6 +6,7 @@
  * (b1, c1, g2 …). Deshalb dürfen diese IDs dort nicht umbenannt werden.
  */
 
+import { artikelInErklaerung } from './umfang.js'
 import { datumDE, STATUS } from './logik.js'
 
 export const DISCLAIMER = 'Die mit diesem Tool erstellte Konformitätserklärung ist ein Entwurf auf Basis der vom Nutzer gemachten Angaben. Sie stellt keine Rechtsberatung dar und begründet keine Gewähr für die rechtliche Konformität der Verpackung. Die alleinige Verantwortung für die Ausstellung der Konformitätserklärung trägt der Erzeuger (Anhang VIII Nr. 3 der Verordnung (EU) 2025/40).'
@@ -118,7 +119,7 @@ export function Erklaerung({ katalog, a, e, nummer }) {
       <section>
         <h2><span className="nr">5.</span>Konformität mit den einschlägigen Rechtsvorschriften der Union</h2>
         <p className="feld abstand">
-          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der Artikel 5 bis 12 der <strong>Verordnung (EU) 2025/40</strong>, soweit
+          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der {artikelInErklaerung()} der <strong>Verordnung (EU) 2025/40</strong>, soweit
           sie zum Ausstellungsdatum gelten{rechtsakte.length ? <>, sowie: {rechtsakte.join('; ')}</> : ''}.
         </p>
         <table>
