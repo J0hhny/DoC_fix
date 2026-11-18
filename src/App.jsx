@@ -24,14 +24,16 @@ const BLOCK_TEXT = {
   Ausstellung: 'Das Datum entscheidet, welche Anforderungen der Verordnung bereits gelten.',
   Profil: 'Diese Angaben steuern, welche Prüffragen für Ihre Verpackung erscheinen.',
   Verpackung: 'Erscheint in Punkt 1 und 4 der Erklärung.',
-  Erzeuger: 'Erscheint in Punkt 2 der Erklärung.',
+  Erzeuger: 'Erscheint in Punkt 2 der Erklärung. Tipp für mehrere Erklärungen: Füllen Sie Ihre Erzeugerdaten einmal aus und sichern Sie sie oben mit „Projekt speichern (Datei)“. Für jede weitere Erklärung laden Sie diese Datei über „Projekt öffnen“ und müssen nichts erneut eintippen. Wir speichern bewusst keine Daten für Sie — alles, was Sie eingeben, bleibt bei Ihnen auf dem Rechner.',
   Normen: 'Erscheint in Punkt 6 der Erklärung.',
   Unterzeichner: 'Erscheint in Punkt 8 der Erklärung.',
 }
 const NACHWEIS_BLOCK = 'Technische Dokumentation'
 const NACHWEIS_TEXT = 'Liegen die Unterlagen vor, mit denen Sie die Konformität belegen? Die Abfrage richtet sich nach den Anforderungen, die Sie oben als erfüllt angegeben haben. Fehlende Nachweise blockieren die Erklärung nicht, sie erscheinen im Lückenreport.'
 const BAUTEIL_BLOCK = 'Bauteile und Messwerte'
-const ANFANGS_OFFEN = ['Ausstellung', 'Profil']
+// Blöcke, die abweichend von der Excel-Reihenfolge ganz an den Anfang gehören (Erzeugerdaten = einmal eingeben, für alle Erklärungen gleich)
+const ZUERST = ['Erzeuger']
+const ANFANGS_OFFEN = ['Erzeuger', 'Ausstellung', 'Profil']
 const TESTMODUS = katalog.modus !== 'produktiv'
 const UMFANG = umfangText()
 
@@ -104,7 +106,10 @@ export default function App() {
     }
   }
 
-  const alleBloecke = bloecke(e.angezeigteFragen)
+  const alleBloecke = (() => {
+    const bl = bloecke(e.angezeigteFragen)
+    return [...ZUERST.flatMap((n) => bl.filter((b) => b.name === n)), ...bl.filter((b) => !ZUERST.includes(b.name))]
+  })()
   const posNormen = alleBloecke.findIndex((b) => b.name === 'Normen')
   const offenGesamt = e.offeneFragen.length + e.offeneNachweise.length
   const auswertbar = e.vollstaendig || e.abbruch
