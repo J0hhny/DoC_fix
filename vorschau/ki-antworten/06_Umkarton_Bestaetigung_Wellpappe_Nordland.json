@@ -1,0 +1,68 @@
+{
+  "dokument": {
+    "aussteller": "Wellpappe Nordland GmbH",
+    "ort_aussteller": "Rendsburg",
+    "adressat": "Molkerei Sonnental eG",
+    "dokumenttyp": "Stoff-/PPWR-Statement",
+    "datum": "2026-11-14",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Faltkarton FEFCO 0201, Wellpappe 2.40 B, braun",
+      "artikelnummer": "WN-0201-4030",
+      "verpackungsart": "Tertiär",
+      "materialien": "Wellpappe 2.40 B",
+      "materialgruppe": "Papier/Pappe",
+      "lebensmittelkontakt": "nein",
+      "verwendungsbedingungen": "Transportverpackung ohne Lebensmittelkontakt",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "400 × 300 × 150 mm",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S1",
+      "aussage": "Summe aus Blei, Cadmium, Quecksilber und sechswertigem Chrom liegt bei 46 mg/kg.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Summe aus Blei, Cadmium, Quecksilber und sechswertigem Chrom bei 46 mg/kg liegt."
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "n. z.",
+      "aussage": "Zu PFAS werden keine Angaben gemacht, da die Verpackung nicht für Lebensmittelkontakt vorgesehen ist.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Karton ist als Transportverpackung ohne Lebensmittelkontakt vorgesehen; zu PFAS machen wir daher keine Angaben."
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "n. z.",
+      "aussage": "Zu PFAS werden keine Angaben gemacht, da die Verpackung nicht für Lebensmittelkontakt vorgesehen ist.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Karton ist als Transportverpackung ohne Lebensmittelkontakt vorgesehen; zu PFAS machen wir daher keine Angaben."
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "n. z.",
+      "aussage": "Zu PFAS werden keine Angaben gemacht, da die Verpackung nicht für Lebensmittelkontakt vorgesehen ist.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Karton ist als Transportverpackung ohne Lebensmittelkontakt vorgesehen; zu PFAS machen wir daher keine Angaben."
+    }
+  ],
+  "hinweise": [
+    "Der Aussteller verweigert PFAS-Angaben mit Verweis auf fehlenden Lebensmittelkontakt (PFAS-Beschränkung der PPWR gilt gemäß Art. 5 Abs. 2 jedoch für Verpackungen mit Lebensmittelkontakt)."
+  ]
+}

@@ -9,7 +9,7 @@
 import { useState } from 'react'
 import { STUFE_TEXT, gilt, bewerte, ampel, fmt } from './bauteile.js'
 import { keyLaden, verarbeite, ZITAT, zahlAusText } from './ki.js'
-import { VORSCHAU, testdokumenteLaden } from './vorschau.js'
+import { VORSCHAU, TESTSAETZE, testdokumenteLaden } from './vorschau.js'
 
 const STATUS_TEXT = { wartet: 'wartet', 'läuft': 'wird gelesen …', fertig: 'gelesen', fehler: 'Fehler' }
 const ZITAT_KLASSE = { [ZITAT.GEFUNDEN]: 'erg-ok', [ZITAT.NICHT_GEFUNDEN]: 'erg-nein', [ZITAT.SCAN]: 'erg-unklar' }
@@ -70,8 +70,8 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
     } finally { setLaeuft(false) }
   }
 
-  async function testdokumente() {
-    try { await dateienNehmen(await testdokumenteLaden()) } catch (e) { setHinweis('Testdokumente nicht ladbar: ' + e.message) }
+  async function testdokumente(satz) {
+    try { await dateienNehmen(await testdokumenteLaden(satz)) } catch (e) { setHinweis('Testdokumente nicht ladbar: ' + e.message) }
   }
 
   const gewaehlt = (sha) => auswahl[sha] || new Set()
@@ -100,7 +100,9 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
             abgelaufen: !!eintrag.pruefung?.abgelaufen, gueltigBis: eintrag.ergebnis?.dokument?.gueltig_bis || '',
           }
           const staerker = alt && alt.stufe && alt.dokument !== neu.dokument && rang(alt.stufe) < rang(neu.stufe)
-          if (!staerker) w[a.datenfeld] = neu
+          // Ein abgelaufenes Dokument überschreibt keine gültige Aussage aus einem anderen Dokument.
+          const aelterUngueltig = alt && alt.stufe && alt.dokument !== neu.dokument && !alt.abgelaufen && neu.abgelaufen
+          if (!staerker && !aelterUngueltig) w[a.datenfeld] = neu
         }
       }
       return p
@@ -134,9 +136,11 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
           {laeuft ? 'Dokumente werden gelesen …' : 'PDFs hierher ziehen oder klicken'}
           <input type="file" accept="application/pdf,.pdf" multiple hidden onChange={(e) => { dateienNehmen(e.target.files); e.target.value = '' }} />
         </label>
-        {VORSCHAU && <button type="button" className="zweit" disabled={laeuft} onClick={testdokumente}>5 Testdokumente (Honigglas) laden</button>}
+        {VORSCHAU && Object.entries(TESTSAETZE).map(([satz, liste]) => (
+          <button key={satz} type="button" className="zweit" disabled={laeuft} onClick={() => testdokumente(satz)}>{liste.length} Testdokumente {satz}</button>
+        ))}
       </div>
-      {VORSCHAU && <p className="klein">Vorschau: Die KI-Antworten sind gespeicherte Gemini-Ergebnisse zu den Testdokumenten. Andere PDFs werden hier nicht ausgelesen.</p>}
+      {VORSCHAU && <p className="klein">Vorschau: Die KI-Antworten sind gespeicherte Gemini-Ergebnisse zu den Testdokumenten (auch per Datei-Upload aus dem Projektordner). Andere PDFs werden hier nicht ausgelesen.</p>}
       {hinweis && <p className="meldung" role="status">{hinweis}</p>}
       {ki.length > 0 && <p className="klein">{ki.filter((x) => x.status === 'fertig').length} von {ki.length} Dokumenten gelesen</p>}
 

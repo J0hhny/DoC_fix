@@ -1,0 +1,82 @@
+{
+  "dokument": {
+    "aussteller": "Etiketten Huber KG",
+    "ort_aussteller": "Passau",
+    "adressat": "k. A.",
+    "dokumenttyp": "Stoff-/PPWR-Statement",
+    "datum": "2026-08-28",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Haftetikett Variante RE (Recyclingpapier)",
+      "artikelnummer": "EH-RE-80x60",
+      "verpackungsart": "k. A.",
+      "materialien": "Recyclingpapier, Acrylat-Dispersionskleber",
+      "materialgruppe": "Papier/Pappe",
+      "lebensmittelkontakt": "nein",
+      "verwendungsbedingungen": "Für die Außenseite der Verpackung bestimmt, kein direkter Kontakt mit dem Lebensmittel.",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "80 × 60 mm",
+      "rezyklatanteil": "k. A."
+    },
+    {
+      "bezeichnung": "Haftetikett Variante FF (Frischfaser)",
+      "artikelnummer": "EH-FF-80x60",
+      "verpackungsart": "k. A.",
+      "materialien": "Frischfaserpapier, Acrylat-Dispersionskleber",
+      "materialgruppe": "Papier/Pappe",
+      "lebensmittelkontakt": "nein",
+      "verwendungsbedingungen": "Für die Außenseite der Verpackung bestimmt, kein direkter Kontakt mit dem Lebensmittel.",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "80 × 60 mm",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S1",
+      "aussage": "Messwerte für Summe Schwermetalle (Pb + Cd + Hg + Cr VI): Variante RE: 128 mg/kg, Variante FF: 18 mg/kg.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Summe Schwermetalle 128 mg/kg 18 mg/kg Prüflabor / Bericht PapierLab Augsburg"
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S5",
+      "aussage": "Zu PFAS liegen keine Untersuchungen vor.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S5",
+      "aussage": "Zu PFAS liegen keine Untersuchungen vor.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S5",
+      "aussage": "Zu PFAS liegen keine Untersuchungen vor.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    }
+  ],
+  "hinweise": [
+    "Für die Variante RE (Recyclingpapier, EH-RE-80x60) überschreitet der gemessene Schwermetallgehalt (128 mg/kg) den gesetzlichen Grenzwert von 100 mg/kg nach Art. 5 PPWR.",
+    "Zu PFAS liegen laut Aussteller ausdrücklich keine Untersuchungen vor."
+  ]
+}

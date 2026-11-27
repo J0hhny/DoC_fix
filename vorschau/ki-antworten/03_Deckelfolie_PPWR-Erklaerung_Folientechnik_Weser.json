@@ -1,0 +1,69 @@
+{
+  "dokument": {
+    "aussteller": "Folientechnik Weser GmbH",
+    "ort_aussteller": "Bremen",
+    "adressat": "allgemein",
+    "dokumenttyp": "Konformitätserklärung PPWR",
+    "datum": "2026-10-10",
+    "gueltig_bis": "2028-10-10",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Peelbare Deckelfolie PeelTop 42, bedruckbar",
+      "artikelnummer": "FW-PEEL-42",
+      "verpackungsart": "k. A.",
+      "materialien": "PET 12 µm / PE 30 µm, peelbar auf APET/PE",
+      "materialgruppe": "Kunststoff",
+      "lebensmittelkontakt": "k. A.",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "k. A.",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S3",
+      "aussage": "Summe der Konzentrationen von Blei, Cadmium, Quecksilber und sechswertigem Chrom überschreitet nicht 100 mg/kg",
+      "grundlage": "Vorlieferant",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "Auf Grundlage der Erklärungen unserer Vorlieferanten bestätigen wir, dass die Summe der Konzentrationen von Blei, Cadmium, Quecksilber und sechswertigem Chrom 100 mg/kg nicht überschreitet."
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S1",
+      "aussage": "Höchster Einzelwert unter 2 µg/kg (Bestimmungsgrenze)",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "höchster Einzelwert < 2 µg/kg (Bestimmungsgrenze)"
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S1",
+      "aussage": "Summe der PFAS beträgt 18 µg/kg",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "Summe der PFAS 18 µg/kg"
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S5",
+      "aussage": "Eine Bestimmung des Gesamtgehalts an PFAS einschließlich polymerer PFAS wurde nicht durchgeführt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    }
+  ],
+  "hinweise": [
+    "Alle Angaben beziehen sich nur auf die unbedruckte Folie; für Druckfarben und Lacke wird auf Erklärungen der jeweiligen Farbenhersteller verwiesen.",
+    "Eine Bestimmung des Gesamtgehalts an PFAS einschließlich polymerer PFAS (df4) wurde ausdrücklich nicht durchgeführt."
+  ]
+}

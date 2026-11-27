@@ -1,0 +1,66 @@
+{
+  "dokument": {
+    "aussteller": "Alpenpack Kunststofftechnik GmbH",
+    "ort_aussteller": "Kempten",
+    "adressat": "allgemein",
+    "dokumenttyp": "Konformitätserklärung PPWR",
+    "datum": "2026-09-15",
+    "gueltig_bis": "2027-09-14",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Tiefziehschale 187 × 137 × 30 mm, transparent",
+      "artikelnummer": "AP-TS-187-30",
+      "verpackungsart": "k. A.",
+      "materialien": "APET/PE (Siegelschicht PE)",
+      "materialgruppe": "Kunststoff",
+      "lebensmittelkontakt": "ja",
+      "verwendungsbedingungen": "Käse, Wurst, Fleisch; Kühllagerung bis +7 °C",
+      "mehrweg": "k. A.",
+      "gewicht": "9,8 g ± 0,3 g",
+      "masse": "187 × 137 × 30 mm",
+      "rezyklatanteil": "50 % rPET"
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S1",
+      "aussage": "Summe Pb + Cd + Hg + Cr VI beträgt 3,2 mg/kg (Grenzwert ≤ 100 mg/kg)",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "Summe Pb + Cd + Hg + Cr VI 3,2 mg/kg ≤ 100 mg/kg (Art. 5 Abs. 4)"
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S1",
+      "aussage": "PFAS gezielte Analyse (32 Einzelstoffe): alle Einzelwerte < 1 µg/kg",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "PFAS gezielte Analyse (32 Einzelstoffe) alle Einzelwerte < 1 µg/kg < 25 µg/kg"
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S1",
+      "aussage": "PFAS Summe (gezielte Analyse) < 10 µg/kg",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "PFAS Summe (gezielte Analyse) < 10 µg/kg < 250 µg/kg (Art. 5 Abs. 5 b)"
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S1",
+      "aussage": "Gesamtfluor (TOF), inkl. polymerer PFAS < 5 mg/kg",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "Gesamtfluor (TOF), inkl. polymerer PFAS < 5 mg/kg < 50 mg/kg (Art. 5 Abs. 5 c)"
+    }
+  ],
+  "hinweise": []
+}

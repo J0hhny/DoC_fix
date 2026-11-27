@@ -1,0 +1,68 @@
+{
+  "dokument": {
+    "aussteller": "Alpenpack Kunststofftechnik GmbH",
+    "ort_aussteller": "Kempten",
+    "adressat": "k. A.",
+    "dokumenttyp": "Konformitätserklärung PPWR",
+    "datum": "2024-03-01",
+    "gueltig_bis": "2025-02-28",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Tiefziehschale 187 × 137 × 30 mm, APET/PE",
+      "artikelnummer": "AP-TS-187-30",
+      "verpackungsart": "k. A.",
+      "materialien": "APET/PE",
+      "materialgruppe": "Kunststoff",
+      "lebensmittelkontakt": "k. A.",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "187 × 137 × 30 mm",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S1",
+      "aussage": "Summe Blei, Cadmium, Quecksilber und sechswertiges Chrom liegt bei 4,0 mg/kg und unter Grenzwert 100 mg/kg",
+      "grundlage": "Analyse",
+      "rechtsbezug": "94/62/EG",
+      "seite": "1",
+      "zitat": "liegt laut Prüfbericht LN-23-10255 bei 4,0 mg/kg und damit unter dem Grenzwert von 100 mg/kg"
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht absichtlich zugesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Per- und polyfluorierte Alkylsubstanzen werden bei der Herstellung nicht absichtlich zugesetzt."
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht absichtlich zugesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Per- und polyfluorierte Alkylsubstanzen werden bei der Herstellung nicht absichtlich zugesetzt."
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht absichtlich zugesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Per- und polyfluorierte Alkylsubstanzen werden bei der Herstellung nicht absichtlich zugesetzt."
+    }
+  ],
+  "hinweise": [
+    "Die Gültigkeit des Dokuments ist am 28.02.2025 abgelaufen."
+  ]
+}

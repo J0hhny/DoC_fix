@@ -129,7 +129,7 @@ function Anfragen({ projekt, pruefung, antworten }) {
           <details key={g.lieferant || '?'} className="anfrage">
             <summary>
               <strong>{g.lieferant || 'Lieferant unbekannt'}</strong>
-              <span className="klein"> · {g.eintraege.map((e) => e.bauteil.name).join(', ')} · {anzahlPunkte(g)} Angaben</span>
+              <span className="klein"> · {g.eintraege.map((e) => e.bauteil.name).join(', ')} · {anzahlPunkte(g)} {anzahlPunkte(g) === 1 ? 'Angabe' : 'Angaben'}</span>
               {luecken > 0 && <span className="zaehler"> {luecken} {luecken === 1 ? 'Lücke' : 'Lücken'} im Text</span>}
             </summary>
             <pre className="anfragetext">{teile.map((t, i) => (i % 2 ? <mark key={i}>{t}</mark> : t))}</pre>
