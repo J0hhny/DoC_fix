@@ -1,10 +1,11 @@
 /**
  * Aufbauskizze in der Demo (Branch demo-doku). Zeigt nur den Aufbau, keine Konformität.
- * Klick auf ein Bauteil öffnet seine Aufbaudaten; Änderungen zeichnen die Skizze sofort neu.
+ * Stückliste unter der Skizze: jedes Bauteil händisch beschreibbar (Lage, Maße, Schichtaufbau, Beschreibung).
+ * Klick auf ein Bauteil in der Skizze öffnet seine Zeile; Änderungen zeichnen die Skizze sofort neu.
  * Werte aus einem zugeordneten Lieferantendokument sind als „aus Dokument“ markiert.
  */
 import { useState } from 'react'
-import { aufbau, layout, ROLLEN, FORMEN, SEITEN } from './skizze.js'
+import { aufbau, layout, ROLLEN, FORMEN, SEITEN, DARSTELLUNG } from './skizze.js'
 
 const kurz = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s }
 
@@ -30,7 +31,7 @@ export default function Aufbauskizze({ projekt, setProjekt }) {
   const dokName = (id) => projekt.dokumente.find((d) => d.id === id)?.name || ''
   const aendern = (f) => setProjekt((p) => f(structuredClone(p)))
   const setze = (id, k, v) => aendern((p) => { p.bauteile.find((b) => b.id === id)[k] = v; return p })
-  const t = a.teile.find((x) => x.b.id === wahl)
+  const pos = (id) => bauteile.findIndex((b) => b.id === id) + 1
   const mitKi = a.teile.filter((x) => x.b.daten).length
 
   return (
@@ -73,7 +74,8 @@ export default function Aufbauskizze({ projekt, setProjekt }) {
             <g key={x.b.id} className="sk-klick" onClick={() => setWahl(x.b.id === wahl ? null : x.b.id)}>
               <polyline className="sk-leit" points={`${ax},${ay} ${ax + 14},${ay} 572,${ly} 580,${ly}`} />
               <circle className="sk-punkt" cx={ax} cy={ay} r="2.4" />
-              <text className="sk-name" x="586" y={ly - 10}>{kurz(x.b.name || 'Bauteil', 18)}{ki && <tspan className="sk-ki"> · aus Dokument</tspan>}</text>
+              {x.beschreibung && <title>{x.beschreibung}</title>}
+              <text className="sk-name" x="586" y={ly - 10}>{pos(x.b.id)}  {kurz(x.b.name || 'Bauteil', 16)}{ki && <tspan className="sk-ki"> · aus Dokument</tspan>}</text>
               <text className="sk-zeile" x="586" y={ly + 8}>{kurz(zeile2, 30)}</text>
               <text className={'sk-zeile' + (x.masseKi || x.gewichtKi ? ' sk-kiwert' : '')} x="586" y={ly + 25}>{kurz(zeile3 || ROLLEN[x.rolle], 30)}</text>
             </g>
@@ -90,37 +92,13 @@ export default function Aufbauskizze({ projekt, setProjekt }) {
       </svg>
 
       {hinweise.length > 0 && <ul className="kihinweise">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
-      <p className="klein">Klicken Sie auf ein Bauteil in der Skizze, um seinen Aufbau zu prüfen oder zu ändern. „automatisch“ = aus Name und Material geraten.</p>
+      <h4 className="skliste-titel">Stückliste — Bauteile beschreiben</h4>
+      <p className="klein">Klicken Sie auf ein Bauteil in der Skizze oder hier in der Liste. Leere Felder übernehmen den Wert aus dem Dokument, „automatisch“ wird aus Name und Material geraten. Haben Körper und Bauteil Maße, zeichnet die Skizze die Breiten maßstäblich.</p>
+      <div className="skliste">
+        {a.teile.map((t) => <Zeile key={t.b.id} t={t} nr={pos(t.b.id)} offen={t.b.id === wahl} umschalten={() => setWahl(t.b.id === wahl ? null : t.b.id)}
+          bauteile={bauteile} setze={(k, v) => setze(t.b.id, k, v)} dokName={dokName} />)}
+      </div>
 
-      {t && (
-        <div className="skdetail">
-          <div className="checkkopf"><strong>{t.b.name || 'Bauteil'}</strong><span className="klein">{t.b.material}</span>
-            <button type="button" className="link" onClick={() => setWahl(null)}>schließen</button></div>
-          <div className="skfelder">
-            <label>Rolle <select value={t.b.rolle || ''} onChange={(e) => setze(t.b.id, 'rolle', e.target.value)}>
-              <option value="">automatisch ({ROLLEN[t.rolle]})</option>
-              {Object.entries(ROLLEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select></label>
-            <label>Sitzt auf <select value={t.aufGeraten ? '__auto' : t.auf} onChange={(e) => setze(t.b.id, 'auf', e.target.value === '__auto' ? null : e.target.value)}>
-              <option value="__auto">automatisch ({bauteile.find((b) => b.id === t.auf)?.name || '—'})</option>
-              <option value="">— nichts —</option>
-              {bauteile.filter((b) => b.id !== t.b.id).map((b) => <option key={b.id} value={b.id}>{b.name || 'Bauteil'}</option>)}
-            </select></label>
-            <label>Seite <select value={t.b.seite || ''} onChange={(e) => setze(t.b.id, 'seite', e.target.value)}>
-              <option value="">automatisch ({SEITEN[t.seite] || '—'})</option>
-              {Object.entries(SEITEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select></label>
-            <Wert label="Schichtaufbau" wert={t.schichten} ki={t.schichtenKi} gesetzt={t.b.schichten} setze={(v) => setze(t.b.id, 'schichten', v)} beispiel="PET 12 µm / PE 30 µm" />
-            <Wert label="Maße" wert={t.masse} ki={t.masseKi} gesetzt={t.b.masse} setze={(v) => setze(t.b.id, 'masse', v)} beispiel="187 × 137 × 30 mm" />
-            <Wert label="Gewicht" wert={t.gewicht} ki={t.gewichtKi} gesetzt={t.b.gewicht} setze={(v) => setze(t.b.id, 'gewicht', v)} beispiel="9,8 g" />
-          </div>
-          {t.b.daten ? (
-            <p className="klein skquelle">Aus Dokument: <strong>{dokName(t.b.daten.dokument) || t.b.daten.dokName}</strong>
-              {t.b.daten.bezeichnung && <> · „{t.b.daten.bezeichnung}“</>}{t.b.daten.artikelnummer && t.b.daten.artikelnummer !== 'k. A.' && <> · Art.-Nr. {t.b.daten.artikelnummer}</>}
-              {t.b.daten.materialien && t.b.daten.materialien !== 'k. A.' && <> · Material laut Dokument: {t.b.daten.materialien}</>}</p>
-          ) : <p className="klein skquelle">Noch kein Lieferantendokument zugeordnet — die Werte oben sind manuell oder geraten.</p>}
-        </div>
-      )}
     </div>
   )
 }
@@ -131,5 +109,57 @@ function Wert({ label, wert, ki, gesetzt, setze, beispiel }) {
     <label><span>{label}{ki && <span className="sk-tag">aus Dokument</span>}</span>
       <input className="eingabe" value={gesetzt || ''} placeholder={ki ? wert : 'z. B. ' + beispiel} onChange={(e) => setze(e.target.value)} />
     </label>
+  )
+}
+
+/** Eine Zeile der Stückliste: zugeklappt die Kurzbeschreibung, aufgeklappt alle Felder. */
+function Zeile({ t, nr, offen, umschalten, bauteile, setze, dokName }) {
+  const b = t.b
+  const aufName = bauteile.find((x) => x.id === t.auf)?.name
+  const lage = [ROLLEN[t.rolle], aufName ? `auf ${aufName}` : '', SEITEN[t.seite] || ''].filter(Boolean).join(' · ')
+  return (
+    <div className={'skzeile' + (offen ? ' an' : '')}>
+      <button type="button" className="skzeilekopf" aria-expanded={offen} onClick={umschalten}>
+        <span className="sknr">{nr}</span><strong>{b.name || 'Bauteil'}</strong>
+        <span className="klein">{lage}{t.masse ? ` · ${t.masse}` : ''}</span>
+        {b.daten && <span className="sk-tag">aus Dokument</span>}
+      </button>
+      {offen && (
+        <div className="skdetail">
+          <div className="skfelder">
+            <label>Rolle <select value={b.rolle || ''} onChange={(e) => setze('rolle', e.target.value)}>
+              <option value="">automatisch ({ROLLEN[t.rolle]})</option>
+              {Object.entries(ROLLEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select></label>
+            <label>Sitzt auf <select value={t.aufGeraten ? '__auto' : t.auf} onChange={(e) => setze('auf', e.target.value === '__auto' ? null : e.target.value)}>
+              <option value="__auto">automatisch ({aufName || '—'})</option>
+              <option value="">— nichts —</option>
+              {bauteile.filter((x) => x.id !== b.id).map((x) => <option key={x.id} value={x.id}>{x.name || 'Bauteil'}</option>)}
+            </select></label>
+            <label>Seite <select value={b.seite || ''} onChange={(e) => setze('seite', e.target.value)}>
+              <option value="">automatisch ({SEITEN[t.seite] || '—'})</option>
+              {Object.entries(SEITEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select></label>
+            {t.rolle !== 'koerper' && t.rolle !== 'verschluss' && (
+              <label>Darstellung am Körper <select value={b.darstellung || ''} onChange={(e) => setze('darstellung', e.target.value)}>
+                <option value="">automatisch</option>
+                {Object.entries(DARSTELLUNG).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select></label>
+            )}
+            <Wert label="Maße (B × T × H)" wert={t.masse} ki={t.masseKi} gesetzt={b.masse} setze={(v) => setze('masse', v)} beispiel={t.rolle === 'koerper' ? '187 × 137 × 30 mm' : '80 × 60 mm'} />
+            <Wert label="Gewicht" wert={t.gewicht} ki={t.gewichtKi} gesetzt={b.gewicht} setze={(v) => setze('gewicht', v)} beispiel="9,8 g" />
+            <Wert label="Schichtaufbau" wert={t.schichten} ki={t.schichtenKi} gesetzt={b.schichten} setze={(v) => setze('schichten', v)} beispiel="PET 12 µm / PE 30 µm" />
+            <label className="breit">Beschreibung (Funktion, Besonderheiten)
+              <input className="eingabe" value={b.beschreibung || ''} placeholder="z. B. peelbar, transparent, mit Aufreißlasche" onChange={(e) => setze('beschreibung', e.target.value)} />
+            </label>
+          </div>
+          {b.daten ? (
+            <p className="klein skquelle">Aus Dokument: <strong>{dokName(b.daten.dokument) || b.daten.dokName}</strong>
+              {b.daten.bezeichnung && <> · „{b.daten.bezeichnung}“</>}{b.daten.artikelnummer && b.daten.artikelnummer !== 'k. A.' && <> · Art.-Nr. {b.daten.artikelnummer}</>}
+              {b.daten.materialien && b.daten.materialien !== 'k. A.' && <> · Material laut Dokument: {b.daten.materialien}</>}</p>
+          ) : <p className="klein skquelle">Kein Lieferantendokument zugeordnet — alle Angaben hier sind manuell oder geraten.</p>}
+        </div>
+      )}
+    </div>
   )
 }

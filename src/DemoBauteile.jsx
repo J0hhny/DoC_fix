@@ -125,7 +125,7 @@ function Anfragen({ projekt, pruefung, antworten }) {
   }
   return (
     <div className="anfragen">
-      <h3>Anfragen an Lieferanten</h3>
+      <h3>5. Anfragen an Lieferanten</h3>
       <p className="klein">Für jede Lücke ein kurzer Anfragetext. Gelb markierte Stellen bitte vor dem Versand ergänzen.</p>
       {gruppen.map((g) => {
         const text = anfrageText(g, antworten)

@@ -15,6 +15,16 @@
 export const ROLLEN = { koerper: 'Körper', verschluss: 'Verschluss', dichtung: 'Dichtung', lack: 'Lack / Beschichtung', druck: 'Druck', etikett: 'Etikett', sonstig: 'Sonstiges' }
 export const FORMEN = { schale_deckel: 'Schale + Deckelfolie', glas_deckel: 'Glas + Deckel', beutel: 'Beutel', generisch: 'Generisch' }
 export const SEITEN = { aussen: 'außen', innen: 'innen' }
+export const DARSTELLUNG = { stapel: 'darüber, mit Abstand', vorne: 'auf der Vorderseite' }
+
+/** Maße aus Freitext: „187 × 137 × 30 mm“ → { breite: 187, hoehe: 30 }, „80 × 60 mm“ → { breite: 80, hoehe: 60 }. */
+export function masseLesen(s) {
+  const z = String(s || '').match(/\d+(?:[,.]\d+)?/g)
+  if (!z || !/mm|cm/.test(String(s))) return null
+  const f = /cm/.test(String(s)) ? 10 : 1
+  const n = z.map((x) => parseFloat(x.replace(',', '.')) * f)
+  return { breite: n[0], tiefe: n.length > 2 ? n[1] : null, hoehe: n.length > 2 ? n[2] : n[1] ?? null }
+}
 
 const REGELN = [
   ['etikett', /etikett|label/],
@@ -72,6 +82,8 @@ export function aufbau(bauteile, formGesetzt) {
         masseKi: !b.masse && !!nichtKA(d.masse),
         gewicht: b.gewicht || nichtKA(d.gewicht),
         gewichtKi: !b.gewicht && !!nichtKA(d.gewicht),
+        darstellung: b.darstellung || '',
+        beschreibung: b.beschreibung || '',
       }
     }),
   }
@@ -80,14 +92,20 @@ export function aufbau(bauteile, formGesetzt) {
 const KOERPER = { schale_deckel: [300, 90, 'schale'], glas_deckel: [190, 180, 'glas'], beutel: [220, 230, 'beutel'], generisch: [280, 110, 'platte'] }
 const VORNE = { schale_deckel: [0.5, 0.4, 0.32], glas_deckel: [0.8, 0.38, 0.42], beutel: [0.6, 0.3, 0.4], generisch: [0.5, 0.4, 0.3] }
 
-/** Lage aller Bauteile im Zeichenbereich (x 40–500, y 40–420 einer 800 × 560-Fläche). */
+/** Lage aller Bauteile im Zeichenbereich (x 40–500, y 40–420 einer 800 × 560-Fläche).
+ *  Haben Körper und Bauteil Maße, werden die Breiten maßstäblich zum Körper gezeichnet. */
 export function layout({ form, teile }) {
   const hinweise = []
   const nachId = new Map(teile.map((t) => [t.b.id, t]))
   for (const t of teile) if (t.auf && !nachId.has(t.auf)) hinweise.push(`„${t.b.name || 'Bauteil'}“ sitzt auf einem Bauteil, das es nicht mehr gibt.`)
   const kinder = (id) => teile.filter((t) => t.auf === id)
   const koerper = teile.find((t) => t.rolle === 'koerper')
-  const [W, H, kform] = KOERPER[form] || KOERPER.generisch
+  let [W, H, kform] = KOERPER[form] || KOERPER.generisch
+  const km = masseLesen(koerper?.masse)
+  const grenz = (x, a, b) => Math.max(a, Math.min(b, x))
+  if (km?.breite && km.hoehe) H = W * grenz(km.hoehe / km.breite, 0.12, 1.6)
+  /** Breite eines Bauteils: maßstäblich, wenn beide Maße haben, sonst Vorgabe. */
+  const breite = (t, vorgabe) => { const m = masseLesen(t.masse); return km?.breite && m?.breite ? W * grenz(m.breite / km.breite, 0.12, 1.6) : vorgabe }
   const stapel = [], platziert = new Set()
   const dazu = (t, shape, w, h) => { stapel.push({ t, shape, w, h }); platziert.add(t.b.id) }
   let verschluss = null
@@ -96,21 +114,23 @@ export function layout({ form, teile }) {
   else {
     verschluss = kinder(koerper.b.id).find((t) => t.rolle === 'verschluss') || teile.find((t) => t.rolle === 'verschluss' && !t.auf)
     if (verschluss) {
-      const cw = form === 'glas_deckel' ? W * 0.78 + 18 : W + 24
+      const cw = breite(verschluss, form === 'glas_deckel' ? W * 0.78 + 18 : W + 24)
       const rang = (r) => ({ etikett: 0, druck: 1, lack: 0, dichtung: 1 }[r] ?? 2)
       kinder(verschluss.b.id).filter((t) => t.seite !== 'innen').sort((a, c) => rang(a.rolle) - rang(c.rolle))
-        .forEach((t) => t.rolle === 'druck' ? dazu(t, 'druck', cw - 20, 8) : dazu(t, 'platte', cw * 0.5, 22))
+        .forEach((t) => t.rolle === 'druck' ? dazu(t, 'druck', breite(t, cw - 20), 8) : dazu(t, 'platte', breite(t, cw * 0.5), 22))
       dazu(verschluss, form === 'glas_deckel' ? 'kappe' : 'folie', cw, form === 'glas_deckel' ? 46 : 10)
       kinder(verschluss.b.id).filter((t) => t.seite === 'innen').sort((a, c) => rang(a.rolle) - rang(c.rolle))
-        .forEach((t) => t.rolle === 'dichtung' ? dazu(t, 'dichtung', cw - 16, 12) : dazu(t, 'platte', cw - 8, 8))
+        .forEach((t) => t.rolle === 'dichtung' ? dazu(t, 'dichtung', breite(t, cw - 16), 12) : dazu(t, 'platte', breite(t, cw - 8), 8))
     }
+    // Teile auf dem Körper: „darüber“ kommt in den Stapel, sonst auf die Vorderseite
+    kinder(koerper.b.id).filter((t) => t !== verschluss && t.darstellung === 'stapel').forEach((t) => dazu(t, 'platte', breite(t, W * 0.6), 18))
     dazu(koerper, kform, W, H)
   }
   const vorne = koerper ? kinder(koerper.b.id).filter((t) => t !== verschluss && !platziert.has(t.b.id)) : []
   vorne.forEach((t) => platziert.add(t.b.id))
   for (const t of teile) if (!platziert.has(t.b.id)) {
     if (koerper) hinweise.push(`„${t.b.name || 'Bauteil'}“: Lage unklar, unten angehängt.`)
-    dazu(t, 'platte', W * 0.6, 20)
+    dazu(t, 'platte', breite(t, W * 0.6), 20)
   }
 
   const abstand = 26
@@ -122,7 +142,12 @@ export function layout({ form, teile }) {
   const ki = stapel.find((i) => i.t === koerper)
   if (ki) {
     const [fw, fh, fy] = VORNE[form] || VORNE.generisch
-    vorne.forEach((t, n) => stapel.push({ t, shape: 'platte', w: ki.w * fw, h: ki.h * fh, x: cx - (ki.w * fw) / 2, y: ki.y + ki.h * fy + n * 6, vorne: true }))
+    vorne.forEach((t, n) => {
+      const m = masseLesen(t.masse)
+      const w = Math.min(ki.w * 0.95, breite(t, W * fw) * sc)
+      const h = km?.breite && m?.breite && m.hoehe ? Math.min(ki.h * 0.9, w * m.hoehe / m.breite) : ki.h * fh
+      stapel.push({ t, shape: 'platte', w, h, x: cx - w / 2, y: Math.min(ki.y + ki.h * fy + n * 6, ki.y + ki.h - h - 4), vorne: true })
+    })
   }
 
   // Beschriftung rechts, ohne Überlappung

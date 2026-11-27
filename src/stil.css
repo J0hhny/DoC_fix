@@ -392,3 +392,12 @@ i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
 .skfelder label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.82rem; color: var(--grau); }
 .sk-tag { display: inline-block; margin-left: 0.4rem; font-size: 0.72rem; color: var(--akzent); background: var(--akzent-hell); padding: 0 0.4rem; border-radius: 8px; }
 .skquelle { margin: 0.6rem 0 0; }
+.skliste-titel { font-size: 0.9rem; margin: 1rem 0 0.2rem; color: var(--dunkel); }
+.skliste { display: grid; gap: 0.35rem; margin-top: 0.4rem; }
+.skzeile { border: 1px solid var(--linie); border-radius: 6px; background: #fff; }
+.skzeile.an { border-color: var(--akzent); }
+.skzeilekopf { all: unset; box-sizing: border-box; width: 100%; display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; align-items: baseline; padding: 0.55rem 0.8rem; cursor: pointer; min-height: 44px; }
+.skzeilekopf:focus-visible { outline: 2px solid var(--akzent); outline-offset: -2px; }
+.sknr { display: inline-grid; place-items: center; min-width: 1.5rem; height: 1.5rem; border: 1px solid var(--text); border-radius: 50%; font-size: 0.78rem; }
+.skzeile .skdetail { border: 0; border-top: 1px solid var(--linie); border-radius: 0 0 6px 6px; margin: 0; }
+.skfelder .breit { grid-column: 1 / -1; }
