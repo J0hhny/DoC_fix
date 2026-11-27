@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import App from './DemoApp.jsx' // Branch demo: Demo-Version; volle Version: ./App.jsx
 import Zugang from './Zugang.jsx'
 import './stil.css'
 

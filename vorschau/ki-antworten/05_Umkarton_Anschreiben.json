@@ -1,0 +1,70 @@
+{
+  "dokument": {
+    "aussteller": "WELLPAPPE BRENNER",
+    "ort_aussteller": "k. A.",
+    "adressat": "allgemein",
+    "dokumenttyp": "Stoff-/PPWR-Statement",
+    "datum": "2027-03-02",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Produktgruppe"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Umkartons aus Wellpappe (Transportverpackung, 6 × 500-g-Gläser)",
+      "artikelnummer": "k. A.",
+      "verpackungsart": "Tertiär",
+      "materialien": "Wellpappe",
+      "materialgruppe": "Papier/Pappe",
+      "lebensmittelkontakt": "k. A.",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "k. A.",
+      "rezyklatanteil": "> 80 % Recyclingfasern"
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S5",
+      "aussage": "Keine Angabe zu Schwermetallen.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S5",
+      "aussage": "Keine konkreten Angaben zu PFAS.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S5",
+      "aussage": "Keine konkreten Angaben zu PFAS.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S5",
+      "aussage": "Keine konkreten Angaben zu PFAS.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    }
+  ],
+  "hinweise": [
+    "Das Dokument enthält ein in der Zukunft liegendes Ausstellungsdatum (02.03.2027).",
+    "Seite 2 enthält Allgemeine Geschäftsbedingungen der 'Spedition Falkner Logistik GmbH', die nicht zum Aussteller Wellpappe Brenner bzw. zum Gegenstand des Anschreibens gehören.",
+    "Das Schreiben kündigt konkrete Erklärungen zu einzelnen Stoffen erst für die Zukunft an, sobald delegierte Rechtsakte veröffentlicht sind."
+  ]
+}

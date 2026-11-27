@@ -8,12 +8,15 @@
  */
 
 export const GLEICHZEITIG = 5
+import { VORSCHAU, vorschauAuslesen } from './vorschau.js'
+
 const KEY_SPEICHER = 'docfix-zugangs-key'
 
 export const keyLaden = () => { try { return sessionStorage.getItem(KEY_SPEICHER) || '' } catch { return '' } }
 export const keyMerken = (k) => { try { sessionStorage.setItem(KEY_SPEICHER, k) } catch {} }
 
 export async function keyPruefen(key) {
+  if (VORSCHAU) return { gueltig: !!key, rest: null }
   const r = await fetch('api/key', { headers: { 'X-Zugangs-Key': key } })
   const d = await r.json().catch(() => ({}))
   return { gueltig: r.ok && d.gueltig, rest: d.rest ?? null, fehler: d.fehler }
@@ -103,7 +106,8 @@ export function codePruefungen(ergebnis, seiten, heute = new Date().toISOString(
 
 // ---------------------------------------------------------------- Anfrage an den Worker
 
-async function auslesen(key, bytes) {
+async function auslesen(key, bytes, name) {
+  if (VORSCHAU) return vorschauAuslesen(name)
   const r = await fetch('api/auslesen', {
     method: 'POST',
     headers: { 'X-Zugangs-Key': key, 'content-type': 'text/plain' },
@@ -132,16 +136,16 @@ export async function verarbeite(dateien, key, bekannt, melde) {
     gesehen.add(sha)
     const eintrag = { sha, name: datei.name, groesse: datei.size, status: 'wartet' }
     melde(eintrag)
-    auftraege.push({ eintrag, bytes })
+    auftraege.push({ eintrag, bytes, name: datei.name })
   }
 
   let naechster = 0
   async function arbeiter() {
     while (naechster < auftraege.length) {
-      const { eintrag, bytes } = auftraege[naechster++]
+      const { eintrag, bytes, name } = auftraege[naechster++]
       melde({ ...eintrag, status: 'läuft' })
       try {
-        const [antwort, seiten] = await Promise.all([auslesen(key, bytes), seitenTexte(bytes)])
+        const [antwort, seiten] = await Promise.all([auslesen(key, bytes, name), seitenTexte(bytes)])
         melde({
           ...eintrag, status: 'fertig', ergebnis: antwort.ergebnis, tokens: antwort.tokens,
           sekunden: antwort.sekunden, modell: antwort.modell, pruefung: codePruefungen(antwort.ergebnis, seiten),

@@ -11,3 +11,4 @@ dist-einzeldatei
 *.local.json
 .wrangler
 .dev.vars
+dist-vorschau

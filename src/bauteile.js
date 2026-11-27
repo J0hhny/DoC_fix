@@ -146,6 +146,17 @@ function bewerteOhneAblauf(feld, dp) {
   return { ergebnis, wert, grund }
 }
 
+/** Muss dieses Bauteil das Datenfeld belegen? PFAS nur bei Lebensmittelkontakt (lm !== false). */
+export const gilt = (feld, b) => !(feld.gehoertZu === 'art5_pfas' && b.lm === false)
+
+/** Ampel nach Vorgabe Demo: grün S1–S3 bzw. erfüllt · orange S4/unklar · rot fehlt (S5) oder Grenzwert überschritten. */
+export function ampel(r) {
+  if (!r) return 'grau'
+  if (r.ergebnis === ERGEBNIS.ERFUELLT) return 'gruen'
+  if (r.ergebnis === ERGEBNIS.NICHT_ERFUELLT || r.ergebnis === ERGEBNIS.FEHLT) return 'rot'
+  return 'orange'
+}
+
 export const fmt = (n) => (Number.isFinite(n) ? n.toLocaleString('de-DE', { maximumFractionDigits: 4 }) : '')
 
 /**
@@ -164,6 +175,8 @@ export function pruefeBauteile(katalog, e0, projekt) {
   const ergebnisse = []
   for (const b of teile) {
     for (const f of felder) {
+      // PFAS (Art. 5 Abs. 5) nur für Bauteile mit Lebensmittelkontakt (Demo, Entscheidung 27.11.2026; fachlich offen, O20).
+      if (!gilt(f, b)) continue
       const dp = werte[b.id]?.[f.id]
       const r = bewerte(f, dp)
       const dok = dp?.dokument ? dokNachId.get(dp.dokument) : null

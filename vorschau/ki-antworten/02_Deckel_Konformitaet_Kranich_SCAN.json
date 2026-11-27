@@ -1,0 +1,69 @@
+{
+  "dokument": {
+    "aussteller": "Verschlusstechnik Kranich GmbH",
+    "ort_aussteller": "Attendorn-Kranich (fiktiv)",
+    "adressat": "allgemein",
+    "dokumenttyp": "Konformitätserklärung PPWR",
+    "datum": "2025-04-02",
+    "gueltig_bis": "2026-03-31",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Twist-off-Deckel TO 82, Weißblech, Innenlack Epoxyphenol, Dichtungsmasse PVC-frei (Compound der Fa. Avendor)",
+      "artikelnummer": "TO82-W-HG, TO82-G-HG",
+      "verpackungsart": "k. A.",
+      "materialien": "Weißblech, Innenlack Epoxyphenol, Dichtungsmasse PVC-frei",
+      "materialgruppe": "Metall",
+      "lebensmittelkontakt": "ja",
+      "verwendungsbedingungen": "Bitte beachten Sie die Verwendungsbedingungen in der Erklärung des Compound-Herstellers.",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "TO 82",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S3",
+      "aussage": "Summe der Konzentrationen von Blei, Cadmium, Quecksilber und sechswertigem Chrom überschreitet nicht 100 mg/kg",
+      "grundlage": "Vorlieferant",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "dass die Summe der Konzentrationen von Blei, Cadmium, Quecksilber und sechswertigem Chrom in den oben genannten Verschlüssen 100 mg/kg nicht überschreitet."
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht bewusst eingesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "PFAS werden bei der Herstellung unserer Verschlüsse nicht bewusst eingesetzt."
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht bewusst eingesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "PFAS werden bei der Herstellung unserer Verschlüsse nicht bewusst eingesetzt."
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S4",
+      "aussage": "PFAS werden bei der Herstellung nicht bewusst eingesetzt",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "PFAS werden bei der Herstellung unserer Verschlüsse nicht bewusst eingesetzt."
+    }
+  ],
+  "hinweise": [
+    "Das Dokument ist seit dem 31.03.2026 abgelaufen (Prüfdatum 2026-11-18).",
+    "Fiktives Testdokument für DoC_fix."
+  ]
+}

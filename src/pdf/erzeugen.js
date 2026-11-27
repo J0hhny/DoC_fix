@@ -33,7 +33,7 @@ export async function pdfErzeugen(ids, props, projekt) {
     const seiten = await ziel.copyPages(quelle, quelle.getPageIndices())
     seiten.forEach((p) => ziel.addPage(p))
   }
-  const titel = ids.length === 1 ? PDF_SEITEN[ids[0]].titel : 'EU-Konformitätserklärung mit Lückenreport und Checkliste'
+  const titel = ids.length === 1 ? PDF_SEITEN[ids[0]].titel : ids.includes('bauteile') ? 'EU-Konformitätserklärung mit Bauteilübersicht' : 'EU-Konformitätserklärung mit Lückenreport und Checkliste'
   ziel.setTitle(`${titel} · ${props.nummer}`, { showInWindowTitleBar: true })
   ziel.setAuthor(props.a.c1 || '')
   ziel.setSubject(`Verordnung (EU) 2025/40 · ${props.a.b1 || ''}`)

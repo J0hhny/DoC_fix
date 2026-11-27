@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from 'react'
 import { keyLaden, keyMerken, keyPruefen } from './ki.js'
+import { VORSCHAU } from './vorschau.js'
 
 const OHNE_SERVER = typeof __EINZELDATEI__ !== 'undefined' && __EINZELDATEI__
 
@@ -35,13 +36,14 @@ export default function Zugang({ children }) {
         <h1>Konformitätserklärung für Verpackungen</h1>
       </header>
       <form className="zugang" onSubmit={(e) => { e.preventDefault(); pruefen(key) }}>
-        <label htmlFor="zkey">Bitte geben Sie Ihren Zugangs-Key ein.</label>
-        <input id="zkey" className="eingabe" autoFocus autoComplete="off" placeholder="PPWR-XXXX-XXXX-XXXX"
+        <label htmlFor="zkey">Bitte geben Sie Ihren Zugangscode ein.</label>
+        <input id="zkey" className="eingabe" autoFocus autoComplete="off" placeholder={VORSCHAU ? 'DEMO' : 'PPWR-XXXX-XXXX-XXXX'}
           value={key} onChange={(e) => setKey(e.target.value)} />
         <button type="submit" disabled={!key.trim() || stand === 'pruefe'}>
           {stand === 'pruefe' ? 'Prüfe …' : 'Weiter'}
         </button>
         {fehler && <p className="abbruch">{fehler}</p>}
+        {VORSCHAU && <p className="hinweisbox">Vorschau: Jeder Code wird angenommen, z. B. <strong>DEMO</strong>.</p>}
         <p className="klein">Ihren Key erhalten Sie von Ihrem Ansprechpartner. Ihre Eingaben und Dokumente werden nicht gespeichert.</p>
       </form>
     </div>

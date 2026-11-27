@@ -11,6 +11,7 @@
     "prebuild": "node scripts/katalog-bauen.mjs",
     "build": "vite build",
     "preview": "vite preview",
+    "build:vorschau": "node scripts/katalog-bauen.mjs && VORSCHAU=1 vite build && node scripts/vorschau-dateien.mjs",
     "build:einzeldatei": "EINZELDATEI=1 vite build && node scripts/einzeldatei.mjs"
   },
   "dependencies": {

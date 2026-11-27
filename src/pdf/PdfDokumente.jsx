@@ -13,6 +13,7 @@ import {
   DISCLAIMER, AKTUALISIERUNG, MODUL_A, VERANTWORTUNG,
   erklaerungDaten, aufbewahrung, gruppieren, quelle, statusText,
 } from '../Dokumente.jsx'
+import { uebersichtZeilen, FELD_KURZ } from '../DemoDokumente.jsx'
 import regular from './schrift/LiberationSans-Regular.ttf?url'
 import bold from './schrift/LiberationSans-Bold.ttf?url'
 import italic from './schrift/LiberationSans-Italic.ttf?url'
@@ -374,7 +375,42 @@ export function MaengellistePdf({ a, e, testmodus }) {
   )
 }
 
+// ------------------------------------------------------------------ Bauteilübersicht (Demo)
+
+const AMPEL_FARBE = { gruen: '#2e7d32', orange: '#e08a00', rot: '#b3261e', grau: '#9aa3b2' }
+
+export function BauteilePdf({ a, e, nummer, pruefung, projekt, testmodus }) {
+  const zeilen = uebersichtZeilen(projekt, pruefung)
+  return (
+    <Seite fusstext={`Bauteilübersicht zu Erklärung Nr. ${nummer}`} testmodus={testmodus}>
+      <Kopf titel="Bauteilübersicht Art. 5" unter="Schwermetalle und PFAS je Bauteil · Anlage zur Erklärung" nummer={`zu Erklärung Nr. ${nummer} · ${a.b1 || ''} · Stand ${datumDE(e.stichtag)}`} />
+      <Text style={[s.klein, s.abstand]}>Grün = ausreichend belegt (S1–S3 bzw. Grenzwert eingehalten) · Orange = schwache Aussage (S4) oder unklar, zusätzliche Bestätigung erforderlich · Rot = keine Aussage (S5) oder Grenzwert überschritten.</Text>
+      {zeilen.map(({ bauteil: b, felder }) => (
+        <Abschnitt key={b.id} titel={`${b.name} · ${b.material} · ${b.lm === false ? 'ohne' : 'mit'} Lebensmittelkontakt${b.lieferant ? ' · ' + b.lieferant : ''}`}>
+          <Tabelle
+            spalten={[{ stil: { width: '3.4cm' } }, { stil: s.breit }, { stil: { width: '4.2cm' }, text: s.klein }]}
+            zeilen={felder.map((z) => [
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: AMPEL_FARBE[z.ampel], marginRight: 5 }} />
+                <Text>{FELD_KURZ[z.feld.id]}</Text>
+              </View>,
+              <View>
+                <Text>{z.wert}</Text>
+                {z.folge ? <Text style={s.klein}>{z.folge}</Text> : null}
+                {z.zitat ? <Text style={s.klein}>„{z.zitat}“</Text> : null}
+              </View>,
+              z.quelle.replace(/\.pdf/i, '').replace(/_/g, ' '),
+            ])}
+          />
+        </Abschnitt>
+      ))}
+      <Hinweis testmodus={testmodus} />
+    </Seite>
+  )
+}
+
 export const PDF_SEITEN = {
+  bauteile: { Komponente: BauteilePdf, titel: 'Bauteilübersicht Art. 5', datei: 'Bauteiluebersicht' },
   erklaerung: { Komponente: ErklaerungPdf, titel: 'EU-Konformitätserklärung', datei: 'Konformitaetserklaerung' },
   luecken: { Komponente: LueckenreportPdf, titel: 'Lückenreport', datei: 'Lueckenreport' },
   checkliste: { Komponente: ChecklistePdf, titel: 'Checkliste technische Dokumentation', datei: 'Checkliste' },

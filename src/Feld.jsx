@@ -81,7 +81,7 @@ export default function Feld({ frage: f, wert, setze, fehlt, spaeter, abgeleitet
       {eingabe}
       {abgeleitet && !abgeleitet.wert && (
         <div className="teilweise">
-          <p>Die Lieferantenunterlagen belegen diese Anforderung nicht vollständig. Die fehlenden Angaben stehen im Lückenreport beim jeweiligen Lieferanten.</p>
+          <p>Die Lieferantenunterlagen belegen diese Anforderung nicht vollständig. Für die orange und rot markierten Bauteile ist eine zusätzliche Bestätigung erforderlich.</p>
           <Herleitung eintraege={abgeleitet.eintraege} />
           {wert === 'ja' && (
             <label className={'bestaetigung' + (weitereNachweise ? '' : ' offen')}>
