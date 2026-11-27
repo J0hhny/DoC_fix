@@ -4,7 +4,7 @@
 // Kontingent je Key (O29): KV-Namespace anlegen (npx wrangler kv namespace create KEYS)
 // und den Block "kv_namespaces" unten mit der ausgegebenen id einkommentieren.
 {
-  "name": "doc-fix",
+  "name": "doc-fix-demo", // Branch demo: eigener Worker, Live bleibt doc-fix (Branch ki)
   "main": "worker/index.js",
   "compatibility_date": "2026-11-01",
   "assets": {
@@ -13,7 +13,7 @@
     "run_worker_first": ["/api/*"]
   },
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": false }],
-  "vars": { "GEMINI_MODELL": "gemini-3.8-flash", "DENKSTUFE": "low" },
+  "vars": { "GEMINI_MODELL": "gemini-3.8-flash", "DENKSTUFE": "low", "ZUGANG_OFFEN": "ja" }, // Demo: jeder Code gilt beim Login
   "observability": { "enabled": false }
   // "kv_namespaces": [{ "binding": "KEYS", "id": "<id aus wrangler kv namespace create>" }]
 }

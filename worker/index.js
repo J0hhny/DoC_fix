@@ -40,6 +40,9 @@ async function pruefeKey(request, env) {
   if (!key) return { ok: false, status: 401, fehler: 'Kein Zugangs-Key angegeben.' }
   const hash = await sha256(key)
 
+  // Demo (Branch demo, Variable ZUGANG_OFFEN = "ja" in wrangler.jsonc): jeder nicht leere Code gilt.
+  if (env.ZUGANG_OFFEN === 'ja') return { ok: true, hash, eintrag: null, rest: null }
+
   if (env.KEYS) {
     const eintrag = await env.KEYS.get(`key:${hash}`, 'json')
     if (!eintrag) return { ok: false, status: 401, fehler: 'Zugangs-Key ungültig.' }
