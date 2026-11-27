@@ -7,7 +7,8 @@
  */
 
 import { umfangText, artikelInErklaerung } from '../umfang.js'
-import { Document, Page, View, Text, StyleSheet, Font, Svg, Polyline } from '@react-pdf/renderer'
+import { Document, Page, View, Text, StyleSheet, Font, Svg, Polyline, Rect, Path, Line, Circle, G } from '@react-pdf/renderer'
+import { aufbau, layout, stueckliste, FORMEN } from '../skizze.js'
 import { datumDE, STATUS } from '../logik.js'
 import {
   DISCLAIMER, AKTUALISIERUNG, MODUL_A, VERANTWORTUNG,
@@ -409,7 +410,108 @@ export function BauteilePdf({ a, e, nummer, pruefung, projekt, testmodus }) {
   )
 }
 
+// ------------------------------------------------------------------ Aufbauskizze (demo-doku)
+
+const SK = { teil: '#eef1f6', linie: '#5f6f86', text: '#16181d', grau: '#666666', akzent: '#1f3864' }
+const tx = (x, y, inhalt, { gr = 13, fett = false, farbe = SK.text, anker = 'start' } = {}) => (
+  <Text x={x} y={y} fill={farbe} textAnchor={anker} style={{ fontFamily: 'Liberation', fontSize: gr, fontWeight: fett ? 'bold' : 'normal' }}>{inhalt}</Text>
+)
+const kurzT = (t, n) => { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t }
+
+function PdfForm({ shape, x, y, w, h }) {
+  const st = { fill: SK.teil, stroke: SK.linie, strokeWidth: 1.4 }
+  switch (shape) {
+    case 'schale': { const f = Math.max(6, h * 0.09); return <G><Rect x={x - 12} y={y} width={w + 24} height={f} rx={2} {...st} /><Path d={`M${x} ${y + f} L${x + w} ${y + f} L${x + w - 26} ${y + h} L${x + 26} ${y + h} Z`} {...st} /></G> }
+    case 'glas': { const nw = w * 0.78, nh = h * 0.14; return <G><Rect x={x + (w - nw) / 2} y={y} width={nw} height={nh} rx={4} {...st} /><Rect x={x} y={y + nh} width={w} height={h - nh} rx={22} {...st} /></G> }
+    case 'beutel': return <G><Path d={`M${x} ${y} L${x + w} ${y} L${x + w + 10} ${y + h} L${x - 10} ${y + h} Z`} {...st} /><Line x1={x} y1={y + 16} x2={x + w} y2={y + 16} stroke={SK.linie} strokeWidth={1} /></G>
+    case 'kappe': return <G><Rect x={x} y={y} width={w} height={h} rx={6} {...st} />{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <Line key={i} x1={x + (w * i) / 9} y1={y + 6} x2={x + (w * i) / 9} y2={y + h - 6} stroke={SK.linie} strokeWidth={0.8} />)}</G>
+    case 'druck': return <G><Rect x={x} y={y} width={w} height={h} rx={1} {...st} /><Line x1={x + 4} y1={y + h / 2} x2={x + w - 4} y2={y + h / 2} stroke={SK.linie} strokeWidth={2} strokeDasharray="10 6" /></G>
+    case 'dichtung': return <Rect x={x} y={y} width={w} height={h} rx={h / 2} {...st} />
+    default: return <Rect x={x} y={y} width={w} height={h} rx={3} {...st} />
+  }
+}
+
+/** Skizze als Vektorgrafik — dieselbe Layout-Engine wie im Formular. */
+function PdfSkizze({ projekt, datum }) {
+  const a = aufbau(projekt.bauteile, projekt.form)
+  const { stapel, marken, mass } = layout(a)
+  const pos = (id) => projekt.bauteile.findIndex((b) => b.id === id) + 1
+  const breite = 450, hoehe = breite * 0.7
+  return (
+    <Svg width={breite} height={hoehe} viewBox="0 0 800 560">
+      <Rect x={8} y={8} width={784} height={544} fill="#ffffff" stroke={SK.text} strokeWidth={1.2} />
+      {mass && (
+        <G>
+          <Line x1={mass.x} y1={mass.y + mass.h + 16} x2={mass.x + mass.w} y2={mass.y + mass.h + 16} stroke={SK.grau} strokeWidth={0.8} />
+          <Line x1={mass.x} y1={mass.y + mass.h + 11} x2={mass.x} y2={mass.y + mass.h + 21} stroke={SK.grau} strokeWidth={0.8} />
+          <Line x1={mass.x + mass.w} y1={mass.y + mass.h + 11} x2={mass.x + mass.w} y2={mass.y + mass.h + 21} stroke={SK.grau} strokeWidth={0.8} />
+          <Line x1={mass.x - 30} y1={mass.y} x2={mass.x - 30} y2={mass.y + mass.h} stroke={SK.grau} strokeWidth={0.8} />
+          <Line x1={mass.x - 35} y1={mass.y} x2={mass.x - 25} y2={mass.y} stroke={SK.grau} strokeWidth={0.8} />
+          <Line x1={mass.x - 35} y1={mass.y + mass.h} x2={mass.x - 25} y2={mass.y + mass.h} stroke={SK.grau} strokeWidth={0.8} />
+          {tx(mass.x + mass.w / 2, mass.y + mass.h + 34, `${mass.breite} mm (Tiefe ${mass.tiefe} mm)`, { farbe: SK.grau, anker: 'middle' })}
+          {tx(mass.x - 30, mass.y - 8, `${mass.hoehe} mm`, { farbe: SK.grau, anker: 'middle' })}
+        </G>
+      )}
+      {stapel.map((i) => <PdfForm key={i.t.b.id} {...i} />)}
+      {marken.map(({ i, ax, ay, ly }) => {
+        const t = i.t
+        const z2 = t.schichten || (t.b.daten?.materialien || '').replace('k. A.', '') || t.b.material
+        const z3 = [t.masse, t.gewicht].filter(Boolean).join(' · ')
+        return (
+          <G key={t.b.id}>
+            <Polyline points={`${ax},${ay} ${ax + 14},${ay} 572,${ly} 580,${ly}`} fill="none" stroke={SK.grau} strokeWidth={0.8} strokeDasharray="3 3" />
+            <Circle cx={ax} cy={ay} r={2.4} fill={SK.text} />
+            {tx(586, ly - 10, `${pos(t.b.id)}  ${kurzT(t.b.name || 'Bauteil', 22)}`, { gr: 15, fett: true })}
+            {tx(586, ly + 8, kurzT(z2, 27), { farbe: SK.grau })}
+            {z3 ? tx(586, ly + 25, kurzT(z3, 27), { farbe: SK.grau }) : null}
+          </G>
+        )
+      })}
+      <Rect x={560} y={490} width={224} height={54} fill="none" stroke={SK.text} strokeWidth={1} />
+      <Line x1={560} y1={508} x2={784} y2={508} stroke={SK.text} strokeWidth={0.6} />
+      <Line x1={560} y1={526} x2={784} y2={526} stroke={SK.text} strokeWidth={0.6} />
+      {tx(568, 503, 'Aufbauskizze · schematisch', { gr: 12, fett: true })}
+      {tx(568, 521, `${FORMEN[a.form]} · o. M.`, { gr: 12 })}
+      {tx(568, 539, `Stand ${datum}`, { gr: 12 })}
+    </Svg>
+  )
+}
+
+export function AufbauPdf({ a, e, nummer, projekt, testmodus }) {
+  const { zeilen } = stueckliste(projekt)
+  return (
+    <Seite fusstext={`Aufbauskizze zu Erklärung Nr. ${nummer}`} testmodus={testmodus}>
+      <Kopf titel="Aufbauskizze und Stückliste" unter="Schematische Darstellung der Verpackung · Anlage zur technischen Dokumentation" nummer={`zu Erklärung Nr. ${nummer} · ${a.b1 || ''} · Stand ${datumDE(e.stichtag)}`} />
+      <View style={{ marginBottom: 10, alignItems: 'center' }} wrap={false}>
+        <PdfSkizze projekt={projekt} datum={datumDE(e.stichtag)} />
+      </View>
+      <Abschnitt titel="Stückliste">
+        <Tabelle
+          spalten={[
+            { titel: 'Nr.', stil: { width: '0.9cm' } },
+            { titel: 'Bauteil · Lage', stil: { width: '3.6cm' } },
+            { titel: 'Material / Aufbau', stil: s.breit },
+            { titel: 'Maße · Gewicht', stil: { width: '3.2cm' } },
+            { titel: 'Quelle', stil: { width: '3.4cm' }, text: s.klein },
+          ]}
+          zeilen={zeilen.map((z) => [
+            String(z.nr),
+            <MitKlein text={z.name} klein={z.lage} />,
+            <MitKlein text={z.material || '—'} klein={z.beschreibung} />,
+            <MitKlein text={z.masse || '—'} klein={z.gewicht} />,
+            z.quelle.replace(/\.pdf$/i, '').replace(/_/g, ' '),
+          ])}
+        />
+      </Abschnitt>
+      <Text style={s.fussnote}>
+        Schematisch, keine Fertigungszeichnung (ergänzt Anhang VII Nr. 2 b, c VO (EU) 2025/40). Lage und Form abgeleitet aus den Bauteilangaben; Material, Maße und Gewicht aus den genannten Dokumenten oder manuell. Maßstäblich nur, wo Maße vorliegen.
+      </Text>
+    </Seite>
+  )
+}
+
 export const PDF_SEITEN = {
+  aufbau: { Komponente: AufbauPdf, titel: 'Aufbauskizze und Stückliste', datei: 'Aufbauskizze' },
   bauteile: { Komponente: BauteilePdf, titel: 'Bauteilübersicht Art. 5', datei: 'Bauteiluebersicht' },
   erklaerung: { Komponente: ErklaerungPdf, titel: 'EU-Konformitätserklärung', datei: 'Konformitaetserklaerung' },
   luecken: { Komponente: LueckenreportPdf, titel: 'Lückenreport', datei: 'Lueckenreport' },

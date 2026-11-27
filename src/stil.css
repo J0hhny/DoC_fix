@@ -401,3 +401,4 @@ i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
 .sknr { display: inline-grid; place-items: center; min-width: 1.5rem; height: 1.5rem; border: 1px solid var(--text); border-radius: 50%; font-size: 0.78rem; }
 .skzeile .skdetail { border: 0; border-top: 1px solid var(--linie); border-radius: 0 0 6px 6px; margin: 0; }
 .skfelder .breit { grid-column: 1 / -1; }
+.sktabelle { margin-top: 1rem; width: 100%; }

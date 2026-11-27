@@ -5,7 +5,7 @@
  * Werte aus einem zugeordneten Lieferantendokument sind als „aus Dokument“ markiert.
  */
 import { useState } from 'react'
-import { aufbau, layout, ROLLEN, FORMEN, SEITEN, DARSTELLUNG } from './skizze.js'
+import { aufbau, layout, stueckliste, ROLLEN, FORMEN, SEITEN, DARSTELLUNG } from './skizze.js'
 
 const kurz = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s }
 
@@ -46,50 +46,7 @@ export default function Aufbauskizze({ projekt, setProjekt }) {
         <span className="klein">{mitKi} von {bauteile.length} Bauteilen mit Daten aus einem Lieferantendokument</span>
       </div>
 
-      <svg className="sk-blatt" viewBox="0 0 800 560" role="img" aria-label="Schematische Aufbauskizze der Verpackung">
-        <rect className="sk-rahmen" x="8" y="8" width="784" height="544" />
-        {mass && (
-          <g className="sk-mass">
-            <line x1={mass.x} y1={mass.y + mass.h + 16} x2={mass.x + mass.w} y2={mass.y + mass.h + 16} />
-            <line x1={mass.x} y1={mass.y + mass.h + 11} x2={mass.x} y2={mass.y + mass.h + 21} />
-            <line x1={mass.x + mass.w} y1={mass.y + mass.h + 11} x2={mass.x + mass.w} y2={mass.y + mass.h + 21} />
-            <line x1={mass.x - 30} y1={mass.y} x2={mass.x - 30} y2={mass.y + mass.h} />
-            <line x1={mass.x - 35} y1={mass.y} x2={mass.x - 25} y2={mass.y} />
-            <line x1={mass.x - 35} y1={mass.y + mass.h} x2={mass.x - 25} y2={mass.y + mass.h} />
-            <text x={mass.x + mass.w / 2} y={mass.y + mass.h + 34} textAnchor="middle">{mass.breite} mm (Tiefe {mass.tiefe} mm)</text>
-            <text x={mass.x - 30} y={mass.y - 8} textAnchor="middle">{mass.hoehe} mm</text>
-          </g>
-        )}
-        {stapel.map((i) => (
-          <g key={i.t.b.id} className="sk-klick" onClick={() => setWahl(i.t.b.id === wahl ? null : i.t.b.id)}>
-            <Form {...i} an={i.t.b.id === wahl} />
-          </g>
-        ))}
-        {marken.map(({ i, ax, ay, ly }) => {
-          const x = i.t
-          const zeile2 = x.schichten || x.b.daten?.materialien?.replace('k. A.', '') || x.b.material
-          const zeile3 = [x.masse, x.gewicht].filter(Boolean).join(' · ')
-          const ki = !!x.b.daten
-          return (
-            <g key={x.b.id} className="sk-klick" onClick={() => setWahl(x.b.id === wahl ? null : x.b.id)}>
-              <polyline className="sk-leit" points={`${ax},${ay} ${ax + 14},${ay} 572,${ly} 580,${ly}`} />
-              <circle className="sk-punkt" cx={ax} cy={ay} r="2.4" />
-              {x.beschreibung && <title>{x.beschreibung}</title>}
-              <text className="sk-name" x="586" y={ly - 10}>{pos(x.b.id)}  {kurz(x.b.name || 'Bauteil', 16)}{ki && <tspan className="sk-ki"> · aus Dokument</tspan>}</text>
-              <text className="sk-zeile" x="586" y={ly + 8}>{kurz(zeile2, 30)}</text>
-              <text className={'sk-zeile' + (x.masseKi || x.gewichtKi ? ' sk-kiwert' : '')} x="586" y={ly + 25}>{kurz(zeile3 || ROLLEN[x.rolle], 30)}</text>
-            </g>
-          )
-        })}
-        <g className="sk-feld">
-          <rect x="560" y="490" width="224" height="54" />
-          <line x1="560" y1="508" x2="784" y2="508" /><line x1="560" y1="526" x2="784" y2="526" />
-          <text x="568" y="503" className="sk-fett">Aufbauskizze · schematisch</text>
-          <text x="568" y="521">{FORMEN[a.form]} · o. M.</text>
-          <text x="568" y="539">Entwurf · {new Date().toLocaleDateString('de-DE')}</text>
-        </g>
-        <text className="sk-fuss" x="20" y="540">Keine Fertigungszeichnung. Ergänzt Anhang VII Nr. 2 b, c VO (EU) 2025/40</text>
-      </svg>
+      <SkizzeSvg a={a} lay={{ stapel, marken, mass }} pos={pos} wahl={wahl} waehle={(id) => setWahl(id === wahl ? null : id)} />
 
       {hinweise.length > 0 && <ul className="kihinweise">{hinweise.map((h, i) => <li key={i}>{h}</li>)}</ul>}
       <h4 className="skliste-titel">Stückliste — Bauteile beschreiben</h4>
@@ -161,5 +118,79 @@ function Zeile({ t, nr, offen, umschalten, bauteile, setze, dokName }) {
         </div>
       )}
     </div>
+  )
+}
+
+/** Die Zeichnung selbst; ohne waehle nur zum Ansehen (Ergebnisseite). */
+function SkizzeSvg({ a, lay, pos, wahl, waehle }) {
+  const { stapel, marken, mass } = lay
+  return (
+    <svg className="sk-blatt" viewBox="0 0 800 560" role="img" aria-label="Schematische Aufbauskizze der Verpackung">
+      <rect className="sk-rahmen" x="8" y="8" width="784" height="544" />
+      {mass && (
+        <g className="sk-mass">
+          <line x1={mass.x} y1={mass.y + mass.h + 16} x2={mass.x + mass.w} y2={mass.y + mass.h + 16} />
+          <line x1={mass.x} y1={mass.y + mass.h + 11} x2={mass.x} y2={mass.y + mass.h + 21} />
+          <line x1={mass.x + mass.w} y1={mass.y + mass.h + 11} x2={mass.x + mass.w} y2={mass.y + mass.h + 21} />
+          <line x1={mass.x - 30} y1={mass.y} x2={mass.x - 30} y2={mass.y + mass.h} />
+          <line x1={mass.x - 35} y1={mass.y} x2={mass.x - 25} y2={mass.y} />
+          <line x1={mass.x - 35} y1={mass.y + mass.h} x2={mass.x - 25} y2={mass.y + mass.h} />
+          <text x={mass.x + mass.w / 2} y={mass.y + mass.h + 34} textAnchor="middle">{mass.breite} mm (Tiefe {mass.tiefe} mm)</text>
+          <text x={mass.x - 30} y={mass.y - 8} textAnchor="middle">{mass.hoehe} mm</text>
+        </g>
+      )}
+      {stapel.map((i) => (
+        <g key={i.t.b.id} className="sk-klick" onClick={() => waehle?.(i.t.b.id)}>
+          <Form {...i} an={i.t.b.id === wahl} />
+        </g>
+      ))}
+      {marken.map(({ i, ax, ay, ly }) => {
+        const x = i.t
+        const zeile2 = x.schichten || x.b.daten?.materialien?.replace('k. A.', '') || x.b.material
+        const zeile3 = [x.masse, x.gewicht].filter(Boolean).join(' · ')
+        const ki = !!x.b.daten
+        return (
+          <g key={x.b.id} className="sk-klick" onClick={() => waehle?.(x.b.id)}>
+            <polyline className="sk-leit" points={`${ax},${ay} ${ax + 14},${ay} 572,${ly} 580,${ly}`} />
+            <circle className="sk-punkt" cx={ax} cy={ay} r="2.4" />
+            {x.beschreibung && <title>{x.beschreibung}</title>}
+            <text className="sk-name" x="586" y={ly - 10}>{pos(x.b.id)}  {kurz(x.b.name || 'Bauteil', 16)}{ki && <tspan className="sk-ki"> · aus Dokument</tspan>}</text>
+            <text className="sk-zeile" x="586" y={ly + 8}>{kurz(zeile2, 30)}</text>
+            <text className={'sk-zeile' + (x.masseKi || x.gewichtKi ? ' sk-kiwert' : '')} x="586" y={ly + 25}>{kurz(zeile3 || ROLLEN[x.rolle], 30)}</text>
+          </g>
+        )
+      })}
+      <g className="sk-feld">
+        <rect x="560" y="490" width="224" height="54" />
+        <line x1="560" y1="508" x2="784" y2="508" /><line x1="560" y1="526" x2="784" y2="526" />
+        <text x="568" y="503" className="sk-fett">Aufbauskizze · schematisch</text>
+        <text x="568" y="521">{FORMEN[a.form]} · o. M.</text>
+        <text x="568" y="539">Entwurf · {new Date().toLocaleDateString('de-DE')}</text>
+      </g>
+      <text className="sk-fuss" x="20" y="540">Keine Fertigungszeichnung. Ergänzt Anhang VII Nr. 2 b, c VO (EU) 2025/40</text>
+    </svg>
+  )
+}
+
+/** Ergebnisseite: Skizze und Stückliste wie im PDF. */
+export function AufbauUebersicht({ projekt }) {
+  if (!projekt.bauteile.length) return <article className="blatt"><p>Keine Bauteile angelegt.</p></article>
+  const a = aufbau(projekt.bauteile, projekt.form)
+  const lay = layout(a)
+  const pos = (id) => projekt.bauteile.findIndex((b) => b.id === id) + 1
+  const { zeilen } = stueckliste(projekt)
+  return (
+    <article className="blatt">
+      <h1>Aufbauskizze und Stückliste</h1>
+      <p className="untertitel">Schematische Darstellung der Verpackung · keine Fertigungszeichnung · ergänzt Anhang VII Nr. 2 b, c</p>
+      <SkizzeSvg a={a} lay={lay} pos={pos} />
+      <table className="matrix sktabelle">
+        <thead><tr><th>Nr.</th><th>Bauteil · Lage</th><th>Material / Aufbau</th><th>Maße · Gewicht</th><th>Quelle</th></tr></thead>
+        <tbody>{zeilen.map((z) => (
+          <tr key={z.nr}><td>{z.nr}</td><td>{z.name}<div className="klein">{z.lage}</div></td><td>{z.material || '—'}{z.beschreibung && <div className="klein">{z.beschreibung}</div>}</td>
+            <td>{z.masse || '—'}{z.gewicht && <div className="klein">{z.gewicht}</div>}</td><td className="klein">{z.quelle.replace(/\.pdf$/i, '').replace(/_/g, ' ')}</td></tr>
+        ))}</tbody>
+      </table>
+    </article>
   )
 }

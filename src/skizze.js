@@ -163,3 +163,23 @@ export function layout({ form, teile }) {
 
   return { stapel, marken, mass, hinweise }
 }
+
+/** Zeilen der Stückliste für Bildschirm und PDF. Quelle = Dokument oder „manuell“. */
+export function stueckliste(projekt) {
+  const a = aufbau(projekt.bauteile, projekt.form)
+  const name = (id) => projekt.bauteile.find((b) => b.id === id)?.name || ''
+  const dok = (d) => (d ? projekt.dokumente.find((x) => x.id === d.dokument)?.name || d.dokName || '' : '')
+  return {
+    form: a.form,
+    zeilen: a.teile.map((t, i) => ({
+      nr: i + 1,
+      name: t.b.name || 'Bauteil',
+      lage: [ROLLEN[t.rolle], t.auf ? `auf ${name(t.auf)}` : '', SEITEN[t.seite] || ''].filter(Boolean).join(', '),
+      material: t.schichten || nichtKA(t.b.daten?.materialien) || t.b.material || '',
+      masse: t.masse || '',
+      gewicht: t.gewicht || '',
+      beschreibung: t.beschreibung || '',
+      quelle: dok(t.b.daten) || 'manuell',
+    })),
+  }
+}

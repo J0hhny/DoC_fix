@@ -17,6 +17,7 @@ import Feld from './Feld.jsx'
 import Block from './Block.jsx'
 import { Erklaerung, erklaerungsNummer } from './Dokumente.jsx'
 import { BauteilUebersicht } from './DemoDokumente.jsx'
+import { AufbauUebersicht } from './Aufbauskizze.jsx'
 import DemoBauteile from './DemoBauteile.jsx'
 import DemoUpload from './DemoUpload.jsx'
 import { pruefeBauteile, leeresProjekt, projektExport } from './bauteile.js'
@@ -114,7 +115,7 @@ export default function DemoApp() {
     try {
       const { pdfErzeugen } = await import('./pdf/erzeugen.js')
       const props = { katalog, a: aEff, e, nummer, pruefung, projekt, testmodus: TESTMODUS }
-      const blob = await pdfErzeugen(['erklaerung', 'bauteile'], props, projektExport({ antworten, nachweise: {}, projekt }))
+      const blob = await pdfErzeugen(['erklaerung', 'bauteile', ...(projekt.bauteile.length ? ['aufbau'] : [])], props, projektExport({ antworten, nachweise: {}, projekt }))
       const ok = await dateiSpeichern(blob, `Konformitaetserklaerung_${nummer}.pdf`)
       if (ok) setMeldung('PDF gespeichert.')
     } catch (err) {
@@ -137,6 +138,7 @@ export default function DemoApp() {
     const docs = [
       ['erklaerung', 'Konformitätserklärung', <Erklaerung key="e" {...props} />],
       ['bauteile', 'Bauteilübersicht Art. 5', <BauteilUebersicht key="b" {...props} />],
+      ['aufbau', 'Aufbauskizze', <AufbauUebersicht key="s" projekt={projekt} />],
     ]
     return (
       <div className="ergebnis">
@@ -149,7 +151,7 @@ export default function DemoApp() {
             ))}
           </div>
           <div className="druckknoepfe">
-            <button type="button" disabled={pdfLaeuft} onClick={pdf}>{pdfLaeuft ? 'PDF wird erstellt …' : 'PDF zum Druck (beide Dokumente)'}</button>
+            <button type="button" disabled={pdfLaeuft} onClick={pdf}>{pdfLaeuft ? 'PDF wird erstellt …' : 'PDF zum Druck (alle Dokumente)'}</button>
           </div>
           {meldung && <p className="meldung" role="status">{meldung}</p>}
         </div>
