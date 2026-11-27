@@ -87,6 +87,12 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
       for (const bid of ziele) {
         const bt = p.bauteile.find((b) => b.id === bid)
         if (bt && !bt.lieferant && aussteller && aussteller !== 'k. A.') bt.lieferant = aussteller
+        // Aufbauskizze (demo-doku): Stammdaten des Artikels aus dem Dokument. Ein abgelaufenes Dokument ersetzt kein gültiges.
+        const v = eintrag.ergebnis?.verpackungen?.[0]
+        const abgelaufen = !!eintrag.pruefung?.abgelaufen
+        if (bt && v && (!bt.daten || (bt.daten.abgelaufen && !abgelaufen))) {
+          bt.daten = { dokument: eintrag.dokId, dokName: eintrag.name, abgelaufen, bezeichnung: v.bezeichnung || '', artikelnummer: v.artikelnummer || '', materialien: v.materialien || '', masse: v.masse || '', gewicht: v.gewicht || '' }
+        }
         for (const a of zeilen) {
           if (!gilt(feldNachId.get(a.datenfeld), bt)) continue // PFAS nur bei Lebensmittelkontakt
           const z = zahlVon(eintrag.sha, a)

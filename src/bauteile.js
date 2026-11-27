@@ -39,7 +39,7 @@ export function zahl(s) {
   return Number.isFinite(n) ? n : NaN
 }
 
-export const leeresProjekt = () => ({ bauteile: [], dokumente: [], werte: {}, ki: [] })
+export const leeresProjekt = () => ({ bauteile: [], dokumente: [], werte: {}, ki: [], form: '' })
 
 // ---------------------------------------------------------------- Aussagestufen (E49)
 
@@ -255,6 +255,6 @@ export function projektImport(json) {
   return {
     antworten: json.antworten || {},
     nachweise: json.nachweise || {},
-    projekt: { bauteile: json.bauteile || [], dokumente: json.dokumente || [], werte: json.werte || {}, ki: json.ki || [] },
+    projekt: { bauteile: json.bauteile || [], dokumente: json.dokumente || [], werte: json.werte || {}, ki: json.ki || [], form: json.form || '' },
   }
 }

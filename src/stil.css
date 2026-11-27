@@ -359,3 +359,36 @@ i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
 .btlief { display: flex; gap: 0.4rem; align-items: center; }
 .eingabe.lief { padding: 0.25rem 0.5rem; font-size: 0.85rem; max-width: 20rem; }
 .kizeilen tr.inaktiv td { color: #9aa3b2; }
+
+/* ---------------------------------------------------------------- Aufbauskizze (demo-doku) */
+.skizze { margin: 0.4rem 0 0.8rem; }
+.skizzekopf { display: flex; flex-wrap: wrap; gap: 0.6rem 1.2rem; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.sk-blatt { width: 100%; height: auto; display: block; background: #fff; border: 1px solid var(--linie); border-radius: 6px; font-family: inherit; }
+.sk-rahmen { fill: none; stroke: var(--text); stroke-width: 1.2; }
+.sk-teil rect, .sk-teil path { fill: #eef1f6; stroke: #5f6f86; stroke-width: 1.4; transition: stroke-width .15s, fill .15s; }
+.sk-teil line { stroke: #5f6f86; stroke-width: 1; }
+.sk-teil .sk-rippe { stroke-width: .8; opacity: .6; }
+.sk-teil .sk-druck { stroke-width: 2; stroke-dasharray: 10 6; }
+.sk-teil.an rect, .sk-teil.an path { fill: var(--akzent-hell); stroke: var(--akzent); stroke-width: 3; }
+.sk-klick { cursor: pointer; }
+.sk-klick:hover .sk-teil rect, .sk-klick:hover .sk-teil path { stroke: var(--akzent); }
+.sk-leit { fill: none; stroke: var(--grau); stroke-width: .8; stroke-dasharray: 3 3; }
+.sk-punkt { fill: var(--text); }
+.sk-name { font-size: 15px; font-weight: 600; fill: var(--text); }
+.sk-ki { font-size: 12px; font-weight: 500; fill: var(--akzent); }
+.sk-zeile { font-size: 13px; fill: var(--grau); }
+.sk-zeile.sk-kiwert { fill: var(--akzent); }
+.sk-mass line { stroke: var(--grau); stroke-width: .8; }
+.sk-mass text { font-size: 13px; fill: var(--grau); }
+.sk-feld rect { fill: none; stroke: var(--text); stroke-width: 1; }
+.sk-feld line { stroke: var(--text); stroke-width: .6; }
+.sk-feld text { font-size: 12px; fill: var(--text); }
+.sk-feld .sk-fett { font-weight: 600; }
+.sk-fuss { font-size: 12px; fill: var(--grau); }
+.skdetail { border: 1px solid var(--akzent); border-radius: 6px; padding: 0.7rem 0.9rem; margin-top: 0.6rem; background: #fff; }
+.skdetail .checkkopf { display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; }
+.skdetail .checkkopf .link { margin-left: auto; }
+.skfelder { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.5rem 0.8rem; margin-top: 0.5rem; }
+.skfelder label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.82rem; color: var(--grau); }
+.sk-tag { display: inline-block; margin-left: 0.4rem; font-size: 0.72rem; color: var(--akzent); background: var(--akzent-hell); padding: 0 0.4rem; border-radius: 8px; }
+.skquelle { margin: 0.6rem 0 0; }

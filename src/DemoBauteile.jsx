@@ -2,7 +2,8 @@
  * Demo: Bauteile und Lieferantenunterlagen.
  *   1. Bauteile: Name, Material, Lebensmittelkontakt ja/nein (flach, ohne Unterbauteile)
  *   2. Upload (DemoUpload, als upload übergeben)
- *   3. Check auf Art. 5 je Bauteil mit Ampel und Textausschnitt
+ *   3. Aufbauskizze aus Bauteilen und Dokumentdaten (Branch demo-doku, skizze.js)
+ *   4. Check auf Art. 5 je Bauteil mit Ampel und Textausschnitt
  * Geprüft wird in bauteile.js.
  */
 
@@ -11,6 +12,7 @@ import { wertText, folgeText } from './Herleitung.jsx'
 import { FELD_NAME } from './DemoUpload.jsx'
 import { useState } from 'react'
 import { anfragen, anfrageText, anzahlPunkte, LUECKE } from './anfrage.js'
+import Aufbauskizze from './Aufbauskizze.jsx'
 
 const neueId = () => 'b' + Math.random().toString(36).slice(2, 8)
 
@@ -71,7 +73,11 @@ export default function DemoBauteile({ projekt, setProjekt, pruefung, material, 
       <h3>2. Lieferantendokumente hochladen</h3>
       {upload}
 
-      <h3>3. Check auf Art. 5 je Bauteil</h3>
+      <h3>3. Aufbauskizze</h3>
+      <p className="klein">Entsteht aus den Bauteilen und den Daten der zugeordneten Lieferantendokumente (Material, Maße, Gewicht). Schematisch, ohne Prüfergebnis.</p>
+      <Aufbauskizze projekt={projekt} setProjekt={setProjekt} />
+
+      <h3>4. Check auf Art. 5 je Bauteil</h3>
       {!bauteile.length ? <p className="klein">Noch keine Bauteile.</p> : (
         <>
           <div className="ampellegende">
