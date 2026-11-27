@@ -7,7 +7,7 @@
  * Aussteller des Dokuments übernommen, wenn er noch leer ist (U5).
  */
 import { useState } from 'react'
-import { STUFE_TEXT, gilt } from './bauteile.js'
+import { STUFE_TEXT, gilt, bewerte, ampel, fmt } from './bauteile.js'
 import { keyLaden, verarbeite, ZITAT, zahlAusText } from './ki.js'
 import { VORSCHAU, testdokumenteLaden } from './vorschau.js'
 
@@ -147,6 +147,9 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
         const fehltZahl = uebernehmbar.some((a) => a.stufe === 'S1' && !zahlVon(x.sha, a).wert)
         const hinweise = [...(x.pruefung?.hinweise || []), ...(x.ergebnis?.hinweise || [])]
         const schon = x.dokId ? zugeordnet(x.dokId) : []
+        // Für welche Bauteile gilt das Dokument? Gewählte, sonst schon zugeordnete. Haben alle keinen LM-Kontakt, ist PFAS grau.
+        const bezug = gewaehlt(x.sha).size ? teile.filter((b) => gewaehlt(x.sha).has(b.id)) : schon
+        const pfasUnnoetig = bezug.length > 0 && bezug.every((b) => b.lm === false)
         return (
           <div key={x.sha} className="kikarte">
             <div className="kikopf">
@@ -167,19 +170,28 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
                       const zs = x.pruefung?.zitate?.[a.datenfeld]
                       const zk = `${x.sha}:${a.datenfeld}`
                       const z = zahlVon(x.sha, a)
+                      const feld = feldNachId.get(a.datenfeld)
+                      const grau = !aktiv.has(a.datenfeld) || (pfasUnnoetig && feld?.gehoertZu === 'art5_pfas')
+                      // S1: Farbe nach Grenzwert (z. B. „< 300“ bei Grenzwert 250 → orange), sonst nach Stufe
+                      const r1 = a.stufe === 'S1' && feld && z.wert ? bewerte(feld, { stufe: 'S1', wert: z.wert, einheit: z.einheit || feld.einheit, kleinerAls: z.kleinerAls }) : null
+                      const farbe = grau ? 'grau' : r1 ? ampel(r1) : stufeAmpel(a.stufe)
                       return (
-                        <tr key={a.datenfeld} className={aktiv.has(a.datenfeld) ? '' : 'inaktiv'}>
-                          <td>{FELD_NAME[a.datenfeld] || a.datenfeld}{!aktiv.has(a.datenfeld) && <div className="klein">nur bei Lebensmittelkontakt</div>}</td>
-                          <td><span className={'chip amp-' + stufeAmpel(a.stufe)}>{a.stufe}</span><div className="klein">{STUFE_TEXT[a.stufe]}</div></td>
+                        <tr key={a.datenfeld} className={grau ? 'inaktiv' : ''}>
+                          <td>{FELD_NAME[a.datenfeld] || a.datenfeld}{grau && <div className="klein">{aktiv.has(a.datenfeld) ? 'nicht nötig — Bauteil ohne Lebensmittelkontakt' : 'nur bei Lebensmittelkontakt'}</div>}</td>
+                          <td>
+                            <span className={'chip amp-' + farbe}>{a.stufe}</span>
+                            <div className="klein">{STUFE_TEXT[a.stufe]}{r1 ? ` · ${z.kleinerAls ? '< ' : ''}${z.wert} ${z.einheit}` : ''}</div>
+                            {r1 && !grau && feld && <div className="klein">Grenzwert {feld.vergleich === '≤' ? 'höchstens' : 'unter'} {fmt(feld.grenzwert)} {feld.einheit}{r1.grund ? ` — ${r1.grund}` : ''}</div>}
+                          </td>
                           <td>
                             {a.zitat ? <q title={a.zitat}>{kurz(a.zitat)}</q> : <span className="klein">— nichts gefunden —</span>}
                             {a.seite && <span className="klein"> · S. {a.seite}</span>}
                             {zs && zs !== ZITAT.GEFUNDEN && <div><span className={'erg ' + (ZITAT_KLASSE[zs] || '')}>Zitat {zs}</span></div>}
-                            {a.stufe === 'S1' && aktiv.has(a.datenfeld) && (
+                            {a.stufe === 'S1' && !grau && (
                               <div className="wertzelle">
                                 Messwert: <input className="eingabe zahl" aria-label="Messwert" value={z.wert} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, wert: e.target.value } })} />
                                 <input className="eingabe zahl" aria-label="Einheit" value={z.einheit} placeholder="Einheit" onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, einheit: e.target.value } })} />
-                                <label className="klein"><input type="checkbox" checked={!!z.kleinerAls} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, kleinerAls: e.target.checked } })} /> „kleiner als“</label>
+                                <label className="klein" title="Laborwert unter der Bestimmungsgrenze, z. B. „< 300 µg/kg“: Der echte Wert liegt irgendwo darunter."><input type="checkbox" checked={!!z.kleinerAls} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, kleinerAls: e.target.checked } })} /> Wert ist nur „kleiner als“ (unter Bestimmungsgrenze)</label>
                               </div>
                             )}
                           </td>

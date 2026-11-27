@@ -197,7 +197,7 @@ export default function DemoApp() {
         {felder('Verpackung')}
         <Block key="bt" titel="Bauteile und Lieferantenunterlagen" text={TEXT.Bauteile} offen={!!offen.Bauteile} umschalten={() => umschalten('Bauteile')}
           fehlend={projekt.bauteile.length ? 0 : 1} label={projekt.bauteile.length ? `${projekt.bauteile.length} Bauteile` : null}>
-          <DemoBauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} material={antworten.p2}
+          <DemoBauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} material={antworten.p2} antworten={antworten}
             upload={<DemoUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />} />
         </Block>
         {blockArt5}

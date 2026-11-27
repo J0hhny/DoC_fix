@@ -9,6 +9,8 @@
 import { ampel, gilt } from './bauteile.js'
 import { wertText, folgeText } from './Herleitung.jsx'
 import { FELD_NAME } from './DemoUpload.jsx'
+import { useState } from 'react'
+import { anfragen, anfrageText, anzahlPunkte, LUECKE } from './anfrage.js'
 
 const neueId = () => 'b' + Math.random().toString(36).slice(2, 8)
 
@@ -24,7 +26,7 @@ const VORSCHLAG = {
 
 const kurz = (t, n = 90) => (t && t.length > n ? t.slice(0, n - 1) + '…' : t)
 
-export default function DemoBauteile({ projekt, setProjekt, pruefung, material, upload }) {
+export default function DemoBauteile({ projekt, setProjekt, pruefung, material, upload, antworten }) {
   const { bauteile, dokumente } = projekt
   const aendern = (f) => setProjekt((p) => f(structuredClone(p)))
   const neu = () => aendern((p) => { p.bauteile.push({ id: neueId(), name: '', material: '', lm: true, lieferant: '', teilVon: null }); return p })
@@ -59,7 +61,7 @@ export default function DemoBauteile({ projekt, setProjekt, pruefung, material, 
                 ))}
               </div>
               <button type="button" className="link warn" onClick={() => weg(b.id)}>entfernen</button>
-              {b.lieferant && <span className="klein btlief">Lieferant: {b.lieferant}</span>}
+              <label className="klein btlief">Lieferant: <input className="eingabe lief" placeholder="wird aus dem Dokument übernommen" value={b.lieferant || ''} onChange={(e) => setze(b.id, 'lieferant', e.target.value)} /></label>
             </div>
           ))}
         </div>
@@ -99,8 +101,43 @@ export default function DemoBauteile({ projekt, setProjekt, pruefung, material, 
               </div>
             ))}
           </div>
+          <Anfragen projekt={projekt} pruefung={pruefung} antworten={antworten} />
         </>
       )}
+    </div>
+  )
+}
+
+/** Anfragetext je Lieferant aus den Lücken. Platzhalter [[…]] sind markiert. */
+function Anfragen({ projekt, pruefung, antworten }) {
+  const [kopiert, setKopiert] = useState('')
+  const gruppen = anfragen(projekt, pruefung)
+  if (!gruppen.length) return <p className="zugeordnet">✓ Alle Bauteile sind ausreichend belegt — keine Anfrage an Lieferanten nötig.</p>
+  async function kopieren(name, text) {
+    try { await navigator.clipboard.writeText(text); setKopiert(name) } catch { setKopiert('fehler') }
+    setTimeout(() => setKopiert(''), 2500)
+  }
+  return (
+    <div className="anfragen">
+      <h3>Anfragen an Lieferanten</h3>
+      <p className="klein">Für jede Lücke ein kurzer Anfragetext. Gelb markierte Stellen bitte vor dem Versand ergänzen.</p>
+      {gruppen.map((g) => {
+        const text = anfrageText(g, antworten)
+        const luecken = text.match(LUECKE)?.length || 0
+        const teile = text.split(/(\[\[[^\]]+\]\])/)
+        return (
+          <details key={g.lieferant || '?'} className="anfrage">
+            <summary>
+              <strong>{g.lieferant || 'Lieferant unbekannt'}</strong>
+              <span className="klein"> · {g.eintraege.map((e) => e.bauteil.name).join(', ')} · {anzahlPunkte(g)} Angaben</span>
+              {luecken > 0 && <span className="zaehler"> {luecken} {luecken === 1 ? 'Lücke' : 'Lücken'} im Text</span>}
+            </summary>
+            <pre className="anfragetext">{teile.map((t, i) => (i % 2 ? <mark key={i}>{t}</mark> : t))}</pre>
+            <button type="button" className="zweit" onClick={() => kopieren(g.lieferant, text)}>Text kopieren</button>
+            <span className="klein"> {kopiert === g.lieferant ? 'kopiert ✓' : kopiert === 'fehler' ? 'Kopieren nicht möglich — Text bitte markieren.' : ''}</span>
+          </details>
+        )
+      })}
     </div>
   )
 }
