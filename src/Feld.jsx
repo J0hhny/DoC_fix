@@ -3,8 +3,9 @@
  */
 
 import { datumDE } from './logik.js'
+import { Herleitung } from './Herleitung.jsx'
 
-export default function Feld({ frage: f, wert, setze, fehlt, spaeter }) {
+export default function Feld({ frage: f, wert, setze, fehlt, spaeter, abgeleitet, weitereNachweise, setzeWeitere }) {
   const name = 'f_' + f.id
   const zusatz = (
     <>
@@ -15,7 +16,15 @@ export default function Feld({ frage: f, wert, setze, fehlt, spaeter }) {
   )
 
   let eingabe
-  switch (f.typ) {
+  if (abgeleitet?.wert) {
+    eingabe = (
+      <div className="abgeleitet">
+        <span className={'antwort ' + (abgeleitet.wert === 'ja' ? 'ja' : 'nein')}>{abgeleitet.wert === 'ja' ? 'Ja' : 'Nein'}</span>
+        <span className="marker">aus Bauteildaten</span>
+        <Herleitung eintraege={abgeleitet.eintraege} />
+      </div>
+    )
+  } else switch (f.typ) {
     case 'ja/nein':
       eingabe = (
         <div className="wahl reihe">
@@ -70,6 +79,19 @@ export default function Feld({ frage: f, wert, setze, fehlt, spaeter }) {
         {f.frage} {zusatz}
       </label>
       {eingabe}
+      {abgeleitet && !abgeleitet.wert && (
+        <div className="teilweise">
+          <p>Die Lieferantenunterlagen belegen diese Anforderung nicht vollständig. Für die orange und rot markierten Bauteile ist eine zusätzliche Bestätigung erforderlich.</p>
+          <Herleitung eintraege={abgeleitet.eintraege} />
+          {wert === 'ja' && (
+            <label className={'bestaetigung' + (weitereNachweise ? '' : ' offen')}>
+              <input type="checkbox" checked={!!weitereNachweise} onChange={(e) => setzeWeitere(e.target.checked)} />
+              {' '}Ich bestätige, dass mir weitere Nachweise vorliegen, die diese Lücken schließen.
+              {!weitereNachweise && <span className="klein"> Ohne diese Bestätigung zählt die Frage als offen.</span>}
+            </label>
+          )}
+        </div>
+      )}
       {(f.erklaerung || f.fundstelle) && (
         <details>
           <summary>Erläuterung</summary>

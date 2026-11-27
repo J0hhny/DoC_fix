@@ -78,3 +78,9 @@ Jedes vom Tool erzeugte Dokument trägt verpflichtend den Hinweis, dass es sich 
 ## Datenhaltung
 
 Keine. Die Eingaben leben ausschließlich im Arbeitsspeicher des Browsers und werden nirgendwohin übertragen. Es gibt keinen Server und keine Datenbank.
+
+## Demo-Version (Branch `demo`) und Vorschau als Claude-Artefakt
+
+- `src/DemoApp.jsx` ist die gekürzte Demo: Login → Testdaten → Erzeuger (Vorlage als Datei) → Profil + Artikelübersicht → Verpackung → Bauteile (Upload, KI, Check je Bauteil mit Ampel) → Art. 5 aus den Bauteilen → Unterzeichner → PDF (Erklärung + Bauteilübersicht).
+- `npm run build:vorschau` baut `dist-vorschau/`. Diese Fassung läuft als Claude-Artefakt ohne Server: jeder Code wird angenommen, die KI-Antworten kommen aus `vorschau/ki-antworten/` (gespeicherte Gemini-Antworten zu den Testdokumenten in `vorschau/testdokumente/`), Dateien werden über die Artefakt-Funktion `downloads` gespeichert.
+- Die Live-Version (`npm run build` → `dist/`) enthält weder Testdokumente noch gespeicherte Antworten.

@@ -178,6 +178,58 @@ button.zweit { background: #fff; color: var(--akzent); border: 1px solid var(--a
 .testvermerk { display: block; margin-top: 4px; color: #8a6d00; }
 
 @page { size: A4; margin: 1.5cm 1.8cm; }
+
+/* ---------------------------------------------------------------- Bauteile (Branch bauteile) */
+.leiste { flex-wrap: wrap; align-items: center; }
+.leiste .projekt { margin-left: auto; display: flex; gap: 1rem; }
+label.link { color: var(--akzent); font-size: 0.88rem; text-decoration: underline; cursor: pointer; padding: 0.2rem 0; }
+button.link.warn { color: var(--rot); }
+button.zweit { background: var(--akzent-hell); color: var(--akzent); }
+.meldung { margin: 0 0 0.7rem; padding: 0.5rem 0.8rem; background: var(--akzent-hell); border-radius: 5px; font-size: 0.88rem; }
+.klein { font-size: 0.78rem; color: var(--grau); }
+
+.bauteile h3 { font-size: 0.95rem; margin: 1.2rem 0 0.4rem; color: var(--dunkel); }
+.dokzeile, .bauteilkopf { display: grid; grid-template-columns: 2fr 1.2fr 1.4fr auto; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
+.dokzeile { grid-template-columns: 2fr 1.2fr 1.3fr 9rem auto; }
+.bauteile select { font: inherit; font-size: 0.85rem; padding: 0.4rem; border: 1px solid #c9ced8; border-radius: 5px; background: #fff; max-width: 100%; }
+.bauteil { border: 1px solid var(--linie); border-radius: 6px; padding: 0.7rem; margin-bottom: 0.6rem; background: #fff; }
+.bauteil.unter { margin: 0.6rem 0 0.4rem 1rem; background: var(--grund); }
+.messwerte { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.4rem; }
+.messwerte th { text-align: left; font-size: 0.72rem; text-transform: uppercase; color: var(--grau); padding: 0.3rem; }
+.messwerte td { padding: 0.35rem 0.3rem; border-top: 1px solid var(--linie); vertical-align: top; }
+.messwerte td:first-child { width: 32%; }
+.messwerte td:nth-child(4) select { width: 100%; }
+.wertzelle { white-space: nowrap; }
+.eingabe.zahl { width: 6rem; padding: 0.35rem 0.5rem; }
+.eingabe.seite { width: 4.5rem; padding: 0.35rem 0.5rem; margin-left: 0.3rem; }
+.kleiner { font-size: 0.85rem; margin-right: 0.3rem; }
+
+.erg { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 0.1rem 0.45rem; border-radius: 3px; white-space: nowrap; }
+.erg-ok { background: #e6f2e7; color: var(--gruen); }
+.erg-nein { background: #fdecea; color: var(--rot); }
+.erg-fehlt { background: var(--grund); color: var(--grau); }
+.erg-unklar { background: var(--gelb-hell); color: var(--gelb); }
+
+.abgeleitet { margin-top: 0.4rem; }
+.abgeleitet .antwort { font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 5px; border: 1px solid var(--akzent); background: var(--akzent-hell); }
+.abgeleitet .antwort.nein { border-color: var(--rot); background: #fdecea; color: var(--rot); }
+.teilweise { margin-top: 0.5rem; padding: 0.5rem 0.7rem; background: var(--gelb-hell); border-radius: 5px; font-size: 0.85rem; }
+.teilweise p { margin: 0 0 0.3rem; color: var(--gelb); }
+.herleitung { border-collapse: collapse; font-size: 0.8rem; margin-top: 0.5rem; }
+.herleitung td { padding: 0.15rem 0.6rem 0.15rem 0; }
+.lieferant h3 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+
+@media screen and (max-width: 820px) {
+  .dokzeile, .bauteilkopf { grid-template-columns: 1fr 1fr; }
+  .messwerte thead { display: none; }
+  .messwerte tr { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; border-top: 1px solid var(--linie); padding: 0.4rem 0; }
+  .messwerte td { border: none; }
+  .messwerte td:first-child { grid-column: 1 / -1; width: auto; }
+  .messwerte select { width: 100%; }
+  .wertzelle { white-space: normal; }
+  .eingabe.zahl { width: 4.5rem; }
+}
+
 @media print {
   body, .ergebnis { background: #fff; }
   .werkzeug { display: none !important; }
@@ -205,3 +257,105 @@ button.zweit { background: #fff; color: var(--akzent); border: 1px solid var(--a
   .matrix td:last-child { white-space: normal; }
   .abschluss { flex-direction: column; align-items: stretch; }
 }
+
+/* KI-Auslesen (KiUpload.jsx) */
+.ki { margin: 0 0 1.6rem; padding: 0 0 1.2rem; border-bottom: 1px solid var(--linie); }
+.kizeile { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.6rem 0; }
+.ablage { display: block; margin: 0.8rem 0; padding: 1.4rem; text-align: center; border: 2px dashed var(--linie); border-radius: 6px; color: var(--grau); cursor: pointer; }
+.ablage.an { border-color: var(--akzent); background: var(--akzent-hell); }
+.ablage.aus { pointer-events: none; opacity: 0.7; }
+.kikarte { margin: 0.8rem 0; padding: 0.8rem 1rem; border: 1px solid var(--linie); border-radius: 6px; background: #fff; }
+.kikopf { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.kikopf strong { flex: 1; word-break: break-word; }
+.kihinweise { margin: 0.4rem 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--gelb); }
+.kiziel { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem; margin-top: 0.6rem; }
+.kikarte q { font-size: 0.85rem; font-style: italic; }
+.umfang { margin: 0.6rem 0 0; padding: 0.5rem 0.8rem; background: var(--gelb-hell); color: var(--gelb); border-radius: 5px; font-size: 0.88rem; }
+.zugang { display: flex; flex-direction: column; gap: 0.7rem; max-width: 26rem; margin: 2rem 0; }
+.zugang label { font-weight: bold; }
+tr.inaktiv { color: #8a919c; }
+tr.inaktiv strong { font-weight: normal; }
+.kiwahl { margin: 0.6rem 0; padding: 0.5rem 0.7rem; background: var(--akzent-hell); border-radius: 5px; }
+.vorlage { margin: 0.5rem 0 1rem; padding: 0.7rem 0.9rem; background: var(--akzent-hell); border-radius: 5px; }
+.vorlage p { margin: 0 0 0.5rem; }
+.bauteile h3 { margin-top: 1.6rem; }
+.handeingabe { margin-top: 1.2rem; }
+.handeingabe summary { cursor: pointer; color: var(--grau); }
+.uebersicht td { vertical-align: top; }
+.quelle { max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bestaetigung { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
+.bestaetigung.offen { color: var(--rot); }
+.stufeninfo { margin: 0.4rem 0 0.8rem; font-size: 0.9rem; }
+.stufeninfo summary { cursor: pointer; color: var(--akzent); }
+.stufeninfo table { border-collapse: collapse; margin-top: 0.4rem; }
+.stufeninfo td { padding: 0.2rem 0.6rem 0.2rem 0; vertical-align: top; }
+
+/* ---------------------------------------------------------------- Demo */
+.hinweisbox { margin: 0.6rem 0; padding: 0.5rem 0.8rem; background: var(--akzent-hell); border-radius: 5px; font-size: 0.88rem; }
+.testknopf { margin-top: 1rem; display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
+button.zweit, .knopf.zweit { background: #fff; color: var(--akzent); border: 1px solid var(--akzent); font-weight: bold; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; font-size: 0.92rem; display: inline-block; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.vorlageknoepfe { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.6rem; }
+.artikeluebersicht .blockinhalt { padding-top: 1.1rem; }
+.matrix tr.inaktiv td { color: #8a909b; }
+.rel { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 10px; font-size: 0.8rem; white-space: nowrap; }
+.rel-jetzt { background: #e8f4ea; color: var(--gruen); }
+.rel-spaeter { background: #e4e8ef; color: #4a5568; }
+.rel-nein { background: #f3f4f7; color: #8a909b; }
+.rel-offen { background: var(--gelb-hell); color: var(--gelb); }
+
+.btliste { display: grid; gap: 0.4rem; margin: 0.4rem 0 0.6rem; }
+.btzeile { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1.4fr) auto auto; gap: 0.5rem; align-items: center; }
+.btzeile.kopfzeile { font-size: 0.78rem; color: var(--grau); }
+.btlief { grid-column: 1 / -1; margin-top: -0.2rem; }
+.klein-wahl label { min-width: 0 !important; padding: 0.3rem 0.7rem !important; font-size: 0.9rem; }
+@media (max-width: 600px) { .btzeile { grid-template-columns: 1fr 1fr; } }
+
+.ablagezeile { display: flex; gap: 0.7rem; align-items: stretch; flex-wrap: wrap; margin: 0.6rem 0; }
+.ablagezeile .ablage { flex: 1; min-width: 14rem; margin: 0; }
+.chip { display: inline-block; min-width: 2.2rem; text-align: center; padding: 0.05rem 0.4rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; font-style: normal; }
+i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
+.chip.amp-gruen { background: #2e7d32; color: #fff; }
+.chip.amp-orange { background: #e08a00; color: #fff; }
+.chip.amp-rot { background: #b3261e; color: #fff; }
+.chip.amp-grau { background: #c4c9d2; color: #fff; }
+.kizeilen q { font-size: 0.85rem; color: #333; }
+.kiziel { margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px dashed var(--linie); }
+.kiwahl { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0.6rem; }
+.kiwahl label { border: 1px solid var(--linie); border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 0.9rem; cursor: pointer; }
+.kiwahl label.an { border-color: var(--akzent); background: var(--akzent-hell); }
+.zugeordnet { margin: 0.5rem 0 0; color: var(--gruen); font-size: 0.88rem; }
+
+.ampellegende { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; font-size: 0.8rem; color: var(--grau); margin: 0.3rem 0 0.7rem; }
+.ampellegende span { display: inline-flex; gap: 0.4rem; align-items: center; }
+.checkliste { display: grid; gap: 0.7rem; }
+.checkkarte { border: 1px solid var(--linie); border-radius: 6px; padding: 0.6rem 0.8rem; }
+.checkkopf { display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.checkfelder { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.5rem; }
+.checkfeld { overflow-wrap: anywhere; border-left: 5px solid; border-radius: 4px; padding: 0.4rem 0.6rem; display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.86rem; }
+.checkfeld.amp-gruen { border-color: #2e7d32; background: #edf6ee; }
+.checkfeld.amp-orange { border-color: #e08a00; background: #fff4e0; }
+.checkfeld.amp-rot { border-color: #b3261e; background: #fdecea; }
+.checkfeld.amp-grau { border-color: #c4c9d2; background: #f6f7f9; color: #8a909b; }
+.cfname { font-weight: bold; }
+.cffolge { font-size: 0.8rem; }
+.cfzitat { font-size: 0.8rem; color: #444; }
+
+.stufenliste { list-style: none; margin: 0.5rem 0; padding: 0; display: grid; gap: 0.3rem; }
+.stufenliste li { border-left: 5px solid; border-radius: 4px; padding: 0.35rem 0.6rem; display: grid; grid-template-columns: minmax(0,8rem) minmax(0,1fr); gap: 0 0.7rem; font-size: 0.86rem; }
+.stufenliste .ampname { font-weight: bold; grid-row: span 3; }
+.stufenliste .ampfolge, .stufenliste .ampquelle { font-size: 0.8rem; color: #444; }
+.amp.amp-gruen { border-color: #2e7d32; background: #edf6ee; }
+.amp.amp-orange { border-color: #e08a00; background: #fff4e0; }
+.amp.amp-rot { border-color: #b3261e; background: #fdecea; }
+.punktfarbe { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.punktfarbe.amp-gruen { background: #2e7d32; } .punktfarbe.amp-orange { background: #e08a00; } .punktfarbe.amp-rot { background: #b3261e; } .punktfarbe.amp-grau { background: #9aa3b2; }
+
+.anfragen { margin-top: 1.2rem; }
+.anfrage { border: 1px solid var(--linie); border-radius: 6px; padding: 0.5rem 0.8rem; margin-bottom: 0.5rem; }
+.anfrage summary { cursor: pointer; }
+.anfragetext { white-space: pre-wrap; font-family: inherit; font-size: 0.88rem; background: #fafbfc; border: 1px solid var(--linie); border-radius: 5px; padding: 0.7rem 0.9rem; margin: 0.6rem 0; }
+.anfragetext mark { background: #ffe58a; padding: 0 2px; border-radius: 2px; }
+.btlief { display: flex; gap: 0.4rem; align-items: center; }
+.eingabe.lief { padding: 0.25rem 0.5rem; font-size: 0.85rem; max-width: 20rem; }
+.kizeilen tr.inaktiv td { color: #9aa3b2; }

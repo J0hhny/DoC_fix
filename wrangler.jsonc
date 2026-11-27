@@ -1,0 +1,19 @@
+// Cloudflare Worker: Seite (dist/) + Server-Funktion /api/* (worker/index.js).
+// Secrets setzen (einmalig, nicht ins Repo):  npx wrangler secret put GEMINI_KEY
+//                                            npx wrangler secret put ZUGANGS_KEYS
+// Kontingent je Key (O29): KV-Namespace anlegen (npx wrangler kv namespace create KEYS)
+// und den Block "kv_namespaces" unten mit der ausgegebenen id einkommentieren.
+{
+  "name": "doc-fix",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": false }],
+  "vars": { "GEMINI_MODELL": "gemini-3.8-flash", "DENKSTUFE": "low" },
+  "observability": { "enabled": false }
+  // "kv_namespaces": [{ "binding": "KEYS", "id": "<id aus wrangler kv namespace create>" }]
+}

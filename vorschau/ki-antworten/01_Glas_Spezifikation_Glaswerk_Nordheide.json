@@ -1,0 +1,68 @@
+{
+  "dokument": {
+    "aussteller": "Glaswerk Nordheide GmbH",
+    "ort_aussteller": "Nordheide",
+    "adressat": "allgemein",
+    "dokumenttyp": "Produktspezifikation",
+    "datum": "2026-08-14",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Sechseckglas 500 ml, Mündung TO 82, Flintglas (weiß)",
+      "artikelnummer": "GN-HX500-82",
+      "verpackungsart": "k. A.",
+      "materialien": "Kalk-Natron-Glas, Flint",
+      "materialgruppe": "Glas",
+      "lebensmittelkontakt": "ja",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "262 g",
+      "masse": "Höhe 118,5 mm",
+      "rezyklatanteil": "ca. 45 %"
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S1",
+      "aussage": "Summe Pb + Cd + Hg + Cr(VI): 38 mg/kg. Grenzwert von 100 mg/kg gemäß Artikel 11 der Richtlinie 94/62/EG eingehalten.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "94/62/EG",
+      "seite": "1",
+      "zitat": "Summe Pb + Cd + Hg + Cr(VI): 38 mg/kg. Damit wird der Grenzwert von 100 mg/kg gemäß Artikel 11 der Richtlinie 94/62/EG eingehalten."
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "n. z.",
+      "aussage": "PFAS werden im Schmelz- und Formgebungsprozess weder eingesetzt noch entstehen sie. Anforderungen zu PFAS für Produkt nicht zutreffend.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Die Anforderungen zu PFAS sind für unser Produkt nicht zutreffend."
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "n. z.",
+      "aussage": "PFAS werden im Schmelz- und Formgebungsprozess weder eingesetzt noch entstehen sie. Anforderungen zu PFAS für Produkt nicht zutreffend.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Die Anforderungen zu PFAS sind für unser Produkt nicht zutreffend."
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "n. z.",
+      "aussage": "PFAS werden im Schmelz- und Formgebungsprozess weder eingesetzt noch entstehen sie. Anforderungen zu PFAS für Produkt nicht zutreffend.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Die Anforderungen zu PFAS sind für unser Produkt nicht zutreffend."
+    }
+  ],
+  "hinweise": [
+    "Bezugnahme bei Schwermetallen erfolgt auf die Richtlinie 94/62/EG statt auf die PPWR."
+  ]
+}

@@ -4,7 +4,7 @@
 
 import { datumDE } from './logik.js'
 
-export default function Block({ titel, text, offen, umschalten, gesamt, fehlend, spaeterAb, children }) {
+export default function Block({ titel, text, offen, umschalten, gesamt, fehlend, spaeterAb, label, children }) {
   const fertig = fehlend === 0
   return (
     <section className={'block' + (offen ? ' auf' : ' zu') + (spaeterAb ? ' nurspaeter' : '')}>
@@ -13,6 +13,7 @@ export default function Block({ titel, text, offen, umschalten, gesamt, fehlend,
         <span className="titel">{titel}</span>
         {spaeterAb
           ? <span className="zaehler spaeter">noch nicht nötig · {spaeterAb.fruehestens ? 'frühestens ab' : 'ab'} {datumDE(spaeterAb.datum)}</span>
+          : label ? <span className="zaehler">{label}</span>
           : <span className={'zaehler' + (fertig ? ' fertig' : '')}>{fertig ? '✓ vollständig' : `${fehlend} offen`}</span>}
       </button>
       {offen && (

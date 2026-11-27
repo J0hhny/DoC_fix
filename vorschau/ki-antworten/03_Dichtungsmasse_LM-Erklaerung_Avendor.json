@@ -1,0 +1,69 @@
+{
+  "dokument": {
+    "aussteller": "Polymertechnik Avendor GmbH",
+    "ort_aussteller": "Ludwigshafen-Avendor (fiktiv)",
+    "adressat": "allgemein",
+    "dokumenttyp": "Lebensmittel-Konformitätserklärung",
+    "datum": "2026-06-20",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Artikel"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Dichtungsmasse AVENSEAL 82 PF (PVC-frei, für Twist-off-Verschlüsse)",
+      "artikelnummer": "k. A.",
+      "verpackungsart": "k. A.",
+      "materialien": "PVC-frei",
+      "materialgruppe": "Kunststoff",
+      "lebensmittelkontakt": "ja",
+      "verwendungsbedingungen": "Geeignet für wässrige, saure und zuckerhaltige Lebensmittel bei Raumtemperatur, Lagerdauer bis 24 Monate. Nicht geeignet für fetthaltige Lebensmittel bei Temperaturen über 40 °C. Verhältnis 6 dm² / 1 kg Lebensmittel.",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "k. A.",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S5",
+      "aussage": "Keine Aussage zum Gehalt an Schwermetallen (nur Migrationswerte nach VO 10/2011 genannt).",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S1",
+      "aussage": "Alle Einzelwerte der 30 analysierten PFAS lagen unter der Bestimmungsgrenze von 10 µg/kg.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Alle Einzelwerte lagen unterhalb der Bestimmungsgrenze von 10 µg/kg"
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S1",
+      "aussage": "Die Summe der 30 gezielt analysierten PFAS lag unter 300 µg/kg (jedoch über dem PPWR-Grenzwert von 250 µg/kg).",
+      "grundlage": "Analyse",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "die Summe der 30 Stoffe lag damit unter 300 µg/kg."
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S5",
+      "aussage": "Keine Aussage zu Gesamt-PFAS / Gesamtfluor / TOF.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    }
+  ],
+  "hinweise": [
+    "Die gezielte Analyse beziffert die Summe der 30 PFAS auf unter 300 µg/kg, was den PPWR-Grenzwert von 250 µg/kg (df3) nicht sicher unterschreitet.",
+    "Für Schwermetalle (df1) sind lediglich Migrationswerte nach VO (EU) Nr. 10/2011 angegeben, keine Gehaltswerte im Verpackungsmaterial."
+  ]
+}

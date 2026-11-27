@@ -6,9 +6,10 @@
  * (b1, c1, g2 …). Deshalb dürfen diese IDs dort nicht umbenannt werden.
  */
 
+import { artikelInErklaerung } from './umfang.js'
 import { datumDE, STATUS } from './logik.js'
 
-const DISCLAIMER = 'Die mit diesem Tool erstellte Konformitätserklärung ist ein Entwurf auf Basis der vom Nutzer gemachten Angaben. Sie stellt keine Rechtsberatung dar und begründet keine Gewähr für die rechtliche Konformität der Verpackung. Die alleinige Verantwortung für die Ausstellung der Konformitätserklärung trägt der Erzeuger (Anhang VIII Nr. 3 der Verordnung (EU) 2025/40).'
+export const DISCLAIMER = 'Die mit diesem Tool erstellte Konformitätserklärung ist ein Entwurf auf Basis der vom Nutzer gemachten Angaben. Sie stellt keine Rechtsberatung dar und begründet keine Gewähr für die rechtliche Konformität der Verpackung. Die alleinige Verantwortung für die Ausstellung der Konformitätserklärung trägt der Erzeuger (Anhang VIII Nr. 3 der Verordnung (EU) 2025/40).'
 
 /** Weitere Unionsrechtsakte für Punkt 5, abgeleitet aus dem Profil. */
 const RECHTSAKTE_P6 = {
@@ -30,7 +31,7 @@ export function erklaerungsNummer(a, stichtag) {
 /** „Art. 5 Abs. 4 · Anhang VII Nr. 2 f“ — ohne Doppelung, wenn die Fundstelle selbst Anhang VII ist. */
 export const quelle = (n) => (n.fundstelle?.startsWith('Anhang VII') ? n.fundstelle : `${n.fundstelle} · Anhang VII ${n.anhangVII}`)
 
-const statusText = (s) => (s.status === STATUS.NICHT_FAELLIG ? s.text : s.status)
+export const statusText = (s) => (s.status === STATUS.NICHT_FAELLIG ? s.text : s.status)
 
 function Kopf({ titel, unter, nummer }) {
   return (
@@ -52,10 +53,14 @@ function Hinweis({ testmodus }) {
   )
 }
 
-// ------------------------------------------------------------------ Erklärung
+// ------------------------------------------------------------------ gemeinsame Daten (Bildschirm + PDF)
 
-export function Erklaerung({ katalog, a, e, nummer }) {
-  const f = (id) => katalog.fragen.find((x) => x.id === id)
+export const AKTUALISIERUNG = 'Eine Aktualisierung dieser Erklärung erfolgt bei Änderung der rechtlichen Anforderungen oder der Produkteigenschaften.'
+export const MODUL_A = 'Entfällt. Die Konformitätsbewertung erfolgte nach Modul A (interne Fertigungskontrolle, Anhang VII). Eine notifizierte Stelle wurde nicht bestimmt.'
+export const VERANTWORTUNG = 'Die alleinige Verantwortung für die Ausstellung dieser Konformitätserklärung trägt der Erzeuger.'
+
+/** Alles, was die Erklärung aus den Antworten ableitet. */
+export function erklaerungDaten(katalog, a) {
   const rechtsakte = []
   if (a.p4 === 'ja') rechtsakte.push('Verordnung (EG) Nr. 1935/2004 (Materialien mit Lebensmittelkontakt)')
   if (RECHTSAKTE_P6[a.p6]) rechtsakte.push(RECHTSAKTE_P6[a.p6])
@@ -68,7 +73,17 @@ export function Erklaerung({ katalog, a, e, nummer }) {
       return `${nr}${was ? ' — ' + was : ''}`
     })
   const normFreitext = katalog.fragen.filter((x) => x.block === 'Normen' && x.typ === 'text' && a[x.id])
+    .map((x) => ({ id: x.id, label: x.frage.replace(/\?$/, ''), wert: a[x.id] }))
   const mehrweg = a.p5 === 'ja'
+  return { rechtsakte, normen, normFreitext, mehrweg }
+}
+
+export const aufbewahrung = (mehrweg) => (mehrweg ? '10 Jahren (Mehrwegverpackung)' : '5 Jahren (Einwegverpackung)')
+
+// ------------------------------------------------------------------ Erklärung
+
+export function Erklaerung({ katalog, a, e, nummer }) {
+  const { rechtsakte, normen, normFreitext, mehrweg } = erklaerungDaten(katalog, a)
 
   return (
     <article className="blatt">
@@ -90,7 +105,7 @@ export function Erklaerung({ katalog, a, e, nummer }) {
 
       <section>
         <h2><span className="nr">3.</span>Verantwortung</h2>
-        <p className="fest">Die alleinige Verantwortung für die Ausstellung dieser Konformitätserklärung trägt der Erzeuger.</p>
+        <p className="fest">{VERANTWORTUNG}</p>
       </section>
 
       <section>
@@ -104,7 +119,7 @@ export function Erklaerung({ katalog, a, e, nummer }) {
       <section>
         <h2><span className="nr">5.</span>Konformität mit den einschlägigen Rechtsvorschriften der Union</h2>
         <p className="feld abstand">
-          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der Artikel 5 bis 12 der <strong>Verordnung (EU) 2025/40</strong>, soweit
+          Der oben beschriebene Gegenstand der Erklärung erfüllt die Anforderungen der {artikelInErklaerung()} der <strong>Verordnung (EU) 2025/40</strong>, soweit
           sie zum Ausstellungsdatum gelten{rechtsakte.length ? <>, sowie: {rechtsakte.join('; ')}</> : ''}.
         </p>
         <table>
@@ -125,13 +140,13 @@ export function Erklaerung({ katalog, a, e, nummer }) {
         <h2><span className="nr">6.</span>Angewandte Normen und technische Spezifikationen</h2>
         {normen.length ? <ul className="normen">{normen.map((n) => <li key={n}>{n}</li>)}</ul> : <p className="feld">Keine harmonisierten Normen angewandt.</p>}
         {normFreitext.map((x) => (
-          <p className="feld" key={x.id}><span className="label">{x.frage.replace(/\?$/, '')}:</span> {a[x.id]}</p>
+          <p className="feld" key={x.id}><span className="label">{x.label}:</span> {x.wert}</p>
         ))}
       </section>
 
       <section>
         <h2><span className="nr">7.</span>Notifizierte Stelle</h2>
-        <p className="feld">Entfällt. Die Konformitätsbewertung erfolgte nach Modul A (interne Fertigungskontrolle, Anhang VII). Eine notifizierte Stelle wurde nicht bestimmt.</p>
+        <p className="feld">{MODUL_A}</p>
       </section>
 
       <section>
@@ -148,8 +163,8 @@ export function Erklaerung({ katalog, a, e, nummer }) {
       </section>
 
       <p className="fussnote">
-        Eine Aktualisierung dieser Erklärung erfolgt bei Änderung der rechtlichen Anforderungen oder der Produkteigenschaften.
-        Diese Erklärung ist gemeinsam mit der technischen Dokumentation nach Anhang VII für die Dauer von {mehrweg ? '10 Jahren (Mehrwegverpackung)' : '5 Jahren (Einwegverpackung)'} nach
+        {AKTUALISIERUNG}
+        {' '}Diese Erklärung ist gemeinsam mit der technischen Dokumentation nach Anhang VII für die Dauer von {aufbewahrung(mehrweg)} nach
         dem Inverkehrbringen aufzubewahren und den zuständigen Behörden auf Verlangen vorzulegen.
       </p>
       <Hinweis testmodus={katalog.modus !== 'produktiv'} />
@@ -159,7 +174,7 @@ export function Erklaerung({ katalog, a, e, nummer }) {
 
 // ------------------------------------------------------------------ Lückenreport
 
-function gruppieren(liste, katalog) {
+export function gruppieren(liste, katalog) {
   const name = (id) => (id === 'allgemein' ? 'Allgemeine Bestandteile (Anhang VII)' : katalog.artikel.find((x) => x.id === id)?.zeile)
   const gruppen = new Map()
   for (const n of liste) {
@@ -169,7 +184,36 @@ function gruppieren(liste, katalog) {
   return [...gruppen.values()]
 }
 
-export function Lueckenreport({ katalog, a, e, na, nummer }) {
+/** Lücken aus den Bauteildaten, je Lieferant — Grundlage für die Anfrage. */
+function LieferantenAnfragen({ pruefung, katalog }) {
+  if (!pruefung?.lieferanten?.length) return null
+  const nachweisText = new Map(katalog.nachweise.map((n) => [n.id, n.frage]))
+  return (
+    <section>
+      <h2>Anfragen an Lieferanten</h2>
+      <p className="feld abstand">Diese Angaben fehlen in den Bauteildaten. Fordern Sie sie beim jeweiligen Lieferanten an.</p>
+      {pruefung.lieferanten.map((l) => (
+        <div key={l.name} className="lieferant">
+          <h3>{l.name}</h3>
+          <table>
+            <thead><tr><th>Bauteil</th><th>Benötigte Angabe</th><th className="status">Stand</th></tr></thead>
+            <tbody>
+              {l.eintraege.map((r) => (
+                <tr key={r.bauteil.id + r.feld.id}>
+                  <td>{r.bauteil.name || 'Bauteil'}{r.bauteil.material && <div className="klein">{r.bauteil.material}</div>}</td>
+                  <td>{r.feld.bezeichnung} ({r.feld.einheit})<div className="klein">{r.feld.fundstelle}{r.feld.nachweis && ` · Beleg: ${nachweisText.get(r.feld.nachweis)}`}</div></td>
+                  <td className="status ja">{r.problem}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+export function Lueckenreport({ katalog, a, e, na, nummer, pruefung }) {
   const spaeter = e.statusmatrix.filter((s) => s.status === STATUS.NICHT_FAELLIG)
   return (
     <article className="blatt">
@@ -184,6 +228,8 @@ export function Lueckenreport({ katalog, a, e, na, nummer }) {
         </p>
         <p className="feld">Die Erklärung gilt nur, wenn die Konformität anhand der technischen Dokumentation nachgewiesen werden kann. Fehlende Nachweise sollten Sie vor der Ausgabe der Erklärung an Handelskunden schließen.</p>
       </section>
+
+      <LieferantenAnfragen pruefung={pruefung} katalog={katalog} />
 
       {gruppieren(e.luecken, katalog).map((g) => (
         <section key={g.titel}>
@@ -226,7 +272,7 @@ export function Lueckenreport({ katalog, a, e, na, nummer }) {
 
 // ------------------------------------------------------------------ Checkliste
 
-const ZEICHEN = { ja: '✓ liegt vor', nein: '✗ fehlt', unklar: '? unklar' }
+export const ZEICHEN = { ja: '✓ liegt vor', nein: '✗ fehlt', unklar: '? unklar' }
 
 export function Checkliste({ katalog, a, e, na, nummer }) {
   const mehrweg = a.p5 === 'ja'

@@ -6,3 +6,9 @@ src/katalog.json
 .vscode
 ~$*.xlsx
 .~lock.*
+dist-einzeldatei
+*.local.csv
+*.local.json
+.wrangler
+.dev.vars
+dist-vorschau

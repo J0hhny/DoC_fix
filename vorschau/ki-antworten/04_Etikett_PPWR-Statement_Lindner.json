@@ -1,0 +1,82 @@
+{
+  "dokument": {
+    "aussteller": "Etikettendruck Lindner KG",
+    "ort_aussteller": "Bielefeld-Lindner",
+    "adressat": "allgemein",
+    "dokumenttyp": "Stoff-/PPWR-Statement",
+    "datum": "2026-09-03",
+    "gueltig_bis": "k. A.",
+    "sprache": "DE",
+    "geltungsbereich": "Produktgruppe"
+  },
+  "verpackungen": [
+    {
+      "bezeichnung": "Papieretiketten der Serien LP-100 und LP-200 (Nassleimetiketten und Haftetiketten auf Papierbasis)",
+      "artikelnummer": "k. A.",
+      "verpackungsart": "k. A.",
+      "materialien": "Papier",
+      "materialgruppe": "Papier/Pappe",
+      "lebensmittelkontakt": "k. A.",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "k. A.",
+      "rezyklatanteil": "k. A."
+    },
+    {
+      "bezeichnung": "Etikett „Blütenhonig 500 g“ (Serie LF)",
+      "artikelnummer": "LF-60-HON-500",
+      "verpackungsart": "k. A.",
+      "materialien": "PP-Folie weiß 60 µm",
+      "materialgruppe": "Kunststoff",
+      "lebensmittelkontakt": "k. A.",
+      "verwendungsbedingungen": "",
+      "mehrweg": "k. A.",
+      "gewicht": "k. A.",
+      "masse": "60 µm",
+      "rezyklatanteil": "k. A."
+    }
+  ],
+  "art5": [
+    {
+      "datenfeld": "df1",
+      "stufe": "S2",
+      "aussage": "Summe von Blei, Cadmium, Quecksilber und sechswertigem Chrom liegt laut Untersuchung unter 100 mg/kg.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "keiner",
+      "seite": "1",
+      "zitat": "Die Summe von Blei, Cadmium, Quecksilber und sechswertigem Chrom liegt laut jährlicher Laboruntersuchung (zuletzt Juni 2026) unter 100 mg/kg."
+    },
+    {
+      "datenfeld": "df2",
+      "stufe": "S5",
+      "aussage": "Eine gezielte Analyse einzelner PFAS wurde ausdrücklich nicht durchgeführt.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df3",
+      "stufe": "S5",
+      "aussage": "Keine Aussage zur Summe gezielt analysierter PFAS.",
+      "grundlage": "k. A.",
+      "rechtsbezug": "keiner",
+      "seite": "",
+      "zitat": ""
+    },
+    {
+      "datenfeld": "df4",
+      "stufe": "S1",
+      "aussage": "Gesamtfluorgehalt (TOF) von 12 mg/kg bestimmt; Grenzwert von 50 mg/kg für PFAS gesamt eingehalten.",
+      "grundlage": "Analyse",
+      "rechtsbezug": "PPWR",
+      "seite": "1",
+      "zitat": "Der Gesamtfluorgehalt (TOF) des Etikettenpapiers wurde mittels Verbrennungs-Ionenchromatographie bestimmt: 12 mg/kg."
+    }
+  ],
+  "hinweise": [
+    "Das Statement gilt ausdrücklich nur für Papieretiketten (Serien LP-100 und LP-200) und gilt nicht für Folienetiketten (Serie LF).",
+    "Die unten auf der Seite vermerkte Kundenbestellung (Art.-Nr. LF-60-HON-500, PP-Folie) ist von der Konformitätsbestätigung ausgenommen."
+  ]
+}

@@ -7,25 +7,36 @@
  */
 
 import { useMemo, useState } from 'react'
-import katalog from './katalog.json'
+import katalogVoll from './katalog.json'
+import { zuschneiden, umfangText } from './umfang.js'
 import { auswerten, bloecke, heute, datumDE, STATUS } from './logik.js'
 import Feld from './Feld.jsx'
 import Block from './Block.jsx'
 import Nachweis from './Nachweis.jsx'
 import { Erklaerung, Lueckenreport, Checkliste, Maengelliste, erklaerungsNummer } from './Dokumente.jsx'
+import Bauteile from './Bauteile.jsx'
+import KiUpload from './KiUpload.jsx'
+import { pruefeBauteile, leeresProjekt, projektExport, projektImport, ERGEBNIS } from './bauteile.js'
 
+// Prüfumfang der Testversion: src/umfang.js
+const katalog = zuschneiden(katalogVoll)
 const BLOCK_TEXT = {
   Ausstellung: 'Das Datum entscheidet, welche Anforderungen der Verordnung bereits gelten.',
   Profil: 'Diese Angaben steuern, welche Prüffragen für Ihre Verpackung erscheinen.',
   Verpackung: 'Erscheint in Punkt 1 und 4 der Erklärung.',
-  Erzeuger: 'Erscheint in Punkt 2 der Erklärung.',
+  Erzeuger: 'Erscheint in Punkt 2 der Erklärung. Tipp für mehrere Erklärungen: Füllen Sie Ihre Erzeugerdaten einmal aus und sichern Sie sie oben mit „Projekt speichern (Datei)“. Für jede weitere Erklärung laden Sie diese Datei über „Projekt öffnen“ und müssen nichts erneut eintippen. Wir speichern bewusst keine Daten für Sie — alles, was Sie eingeben, bleibt bei Ihnen auf dem Rechner.',
   Normen: 'Erscheint in Punkt 6 der Erklärung.',
   Unterzeichner: 'Erscheint in Punkt 8 der Erklärung.',
 }
 const NACHWEIS_BLOCK = 'Technische Dokumentation'
 const NACHWEIS_TEXT = 'Liegen die Unterlagen vor, mit denen Sie die Konformität belegen? Die Abfrage richtet sich nach den Anforderungen, die Sie oben als erfüllt angegeben haben. Fehlende Nachweise blockieren die Erklärung nicht, sie erscheinen im Lückenreport.'
-const ANFANGS_OFFEN = ['Ausstellung', 'Profil']
+const BAUTEIL_BLOCK = 'Bauteile und Lieferantenunterlagen'
+// Blöcke, die abweichend von der Excel-Reihenfolge ganz an den Anfang gehören (Erzeugerdaten = einmal eingeben, für alle Erklärungen gleich)
+const ZUERST = ['Erzeuger']
+const BESTAETIGT = '__weitereNachweise'
+const ANFANGS_OFFEN = ['Erzeuger', 'Ausstellung', 'Profil']
 const TESTMODUS = katalog.modus !== 'produktiv'
+const UMFANG = umfangText()
 
 const datumsFrage = katalog.fragen.find((f) => f.typ === 'datum' && f.block === 'Ausstellung')
 const artikelNachId = new Map(katalog.artikel.map((a) => [a.id, a]))
@@ -41,34 +52,98 @@ export default function App() {
   const [offen, setOffen] = useState(() => Object.fromEntries(ANFANGS_OFFEN.map((b) => [b, true])))
   const [ansicht, setAnsicht] = useState('formular') // formular · ergebnis
   const [dokument, setDokument] = useState('erklaerung')
-  const [druckAlle, setDruckAlle] = useState(false)
+  const [pdfLaeuft, setPdfLaeuft] = useState(false)
+  const [projekt, setProjekt] = useState(leeresProjekt)
+  const [meldung, setMeldung] = useState('')
 
   const setze = (id, wert) => setAntworten((a) => ({ ...a, [id]: wert }))
   const setzeNachweis = (id, wert) => setNachweise((a) => ({ ...a, [id]: wert }))
   const umschalten = (name) => setOffen((o) => ({ ...o, [name]: !o[name] }))
 
-  const e = useMemo(() => auswerten(katalog, antworten, nachweise), [antworten, nachweise])
-  const nummer = erklaerungsNummer(antworten, e.stichtag)
+  // Zwei Durchläufe: erst ohne Bauteildaten (welche Fragen sind sichtbar?),
+  // dann mit den daraus abgeleiteten Antworten. Abgeleitet schlägt Selbstauskunft.
+  const { e, pruefung, aEff, nEff } = useMemo(() => {
+    const e0 = auswerten(katalog, antworten, nachweise)
+    const pruefung = pruefeBauteile(katalog, e0, projekt)
+    const aEff = { ...antworten, ...pruefung.antworten }
+    // Unterlagen unvollständig + Selbstauskunft „Ja“: zählt nur mit Bestätigung weiterer Nachweise, sonst bleibt die Frage offen.
+    for (const [id, d] of Object.entries(pruefung.details)) {
+      if (!d.wert && aEff[id] === 'ja' && !antworten[id + BESTAETIGT]) delete aEff[id]
+    }
+    const nEff = { ...nachweise, ...pruefung.nachweise }
+    return { e: auswerten(katalog, aEff, nEff), pruefung, aEff, nEff }
+  }, [antworten, nachweise, projekt])
+  const nummer = erklaerungsNummer(aEff, e.stichtag)
 
-  const alleBloecke = bloecke(e.angezeigteFragen)
+  function speichern() {
+    const daten = projektExport({ antworten, nachweise, projekt })
+    const blob = new Blob([JSON.stringify(daten, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const name = (antworten.b1 || 'verpackung').replace(/[^\wäöüÄÖÜß-]+/g, '_').slice(0, 40)
+    a.href = url
+    a.download = `DoC_fix_${name}_${e.stichtag}.json`
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    setMeldung('Projektdatei gespeichert. Bewahren Sie sie zusammen mit den Dokumenten auf.')
+  }
+
+  async function oeffnen(ev) {
+    const datei = ev.target.files?.[0]
+    ev.target.value = ''
+    if (!datei) return
+    try {
+      let json
+      if (datei.name.toLowerCase().endsWith('.pdf') || datei.type === 'application/pdf') {
+        const { projektAusPdf } = await import('./pdf/erzeugen.js')
+        json = await projektAusPdf(new Uint8Array(await datei.arrayBuffer()))
+        if (!json) throw new Error('In diesem PDF ist keine Projektdatei eingebettet. Nur PDFs, die mit diesem Tool erstellt wurden, lassen sich öffnen.')
+      } else {
+        json = JSON.parse(await datei.text())
+      }
+      const d = projektImport(json)
+      setAntworten(d.antworten)
+      setNachweise(d.nachweise)
+      setProjekt(d.projekt)
+      setMeldung(`Projekt „${datei.name}“ geöffnet.`)
+    } catch (err) {
+      setMeldung('Datei konnte nicht geöffnet werden: ' + err.message)
+    }
+  }
+
+  const alleBloecke = (() => {
+    const bl = bloecke(e.angezeigteFragen)
+    return [...ZUERST.flatMap((n) => bl.filter((b) => b.name === n)), ...bl.filter((b) => !ZUERST.includes(b.name))]
+  })()
   const posNormen = alleBloecke.findIndex((b) => b.name === 'Normen')
   const offenGesamt = e.offeneFragen.length + e.offeneNachweise.length
   const auswertbar = e.vollstaendig || e.abbruch
 
   function alle(auf) {
-    const namen = [...alleBloecke.map((b) => b.name), NACHWEIS_BLOCK]
+    const namen = [...alleBloecke.map((b) => b.name), NACHWEIS_BLOCK, BAUTEIL_BLOCK]
     setOffen(Object.fromEntries(namen.map((n) => [n, auf])))
   }
 
-  function drucken(alleDrei) {
-    setDruckAlle(alleDrei)
-    window.addEventListener('afterprint', () => setDruckAlle(false), { once: true })
-    setTimeout(() => window.print(), 50)
+  /** Echtes PDF im Browser erzeugen; die Projektdatei steckt als Anhang darin. */
+  async function pdfHerunterladen(ids) {
+    setPdfLaeuft(true)
+    setMeldung('')
+    try {
+      const { pdfErzeugen, dateiname, herunterladen } = await import('./pdf/erzeugen.js')
+      const props = { katalog, a: aEff, e, na: nEff, nummer, pruefung, testmodus: TESTMODUS }
+      const blob = await pdfErzeugen(ids, props, projektExport({ antworten, nachweise, projekt }))
+      herunterladen(blob, dateiname(ids, nummer))
+    } catch (err) {
+      console.error(err)
+      setMeldung('PDF konnte nicht erstellt werden: ' + err.message)
+    } finally {
+      setPdfLaeuft(false)
+    }
   }
 
   // ---------------------------------------------------------------- Ergebnis
   if (ansicht === 'ergebnis') {
-    const props = { katalog, a: antworten, e, na: nachweise, nummer }
+    const props = { katalog, a: aEff, e, na: nEff, nummer, pruefung }
     const docs = e.abbruch
       ? [['maengel', 'Mängelliste', <Maengelliste key="m" {...props} />]]
       : [
@@ -78,7 +153,7 @@ export default function App() {
         ]
     const aktiv = docs.find((d) => d[0] === dokument) ? dokument : docs[0][0]
     return (
-      <div className={'ergebnis' + (druckAlle ? ' druck-alle' : '')}>
+      <div className="ergebnis">
         <div className="werkzeug">
           <button type="button" className="zurueck" onClick={() => setAnsicht('formular')}>← Angaben ändern</button>
           <div className="reiter" role="tablist">
@@ -87,10 +162,17 @@ export default function App() {
             ))}
           </div>
           <div className="druckknoepfe">
-            <button type="button" onClick={() => drucken(false)}>Dieses Dokument drucken / als PDF</button>
-            {docs.length > 1 && <button type="button" className="zweit" onClick={() => drucken(true)}>Alle drei drucken</button>}
+            <button type="button" disabled={pdfLaeuft} onClick={() => pdfHerunterladen([aktiv])}>
+              {pdfLaeuft ? 'PDF wird erstellt …' : 'Dieses Dokument als PDF'}
+            </button>
+            {docs.length > 1 && (
+              <button type="button" className="zweit" disabled={pdfLaeuft} onClick={() => pdfHerunterladen(docs.map((d) => d[0]))}>
+                Alle drei in einem PDF
+              </button>
+            )}
           </div>
-          <p className="druckhinweis">Im Druckdialog „Als PDF speichern“ wählen und unter „Weitere Einstellungen“ den Haken bei „Kopf- und Fußzeilen“ entfernen.</p>
+          <p className="druckhinweis">Im PDF ist Ihre Projektdatei eingebettet. Über „Projekt öffnen“ laden Sie es später wieder und arbeiten am selben Stand weiter.</p>
+          {meldung && <p className="meldung" role="status">{meldung}</p>}
         </div>
         {docs.map(([id, , el]) => (
           <div key={id} className={'dok' + (aktiv === id ? ' sichtbar' : '')} data-dok={id}>{el}</div>
@@ -104,7 +186,18 @@ export default function App() {
     <Block key={NACHWEIS_BLOCK} titel={NACHWEIS_BLOCK + ' — Nachweis-Check'} text={NACHWEIS_TEXT}
       offen={!!offen[NACHWEIS_BLOCK]} umschalten={() => umschalten(NACHWEIS_BLOCK)}
       gesamt={e.sichtbareNachweise.length} fehlend={e.offeneNachweise.length}>
-      {e.sichtbareNachweise.map((n) => <Nachweis key={n.id} nachweis={n} wert={nachweise[n.id]} setze={setzeNachweis} />)}
+      {e.sichtbareNachweise.map((n) => <Nachweis key={n.id} nachweis={n} wert={nEff[n.id]} setze={setzeNachweis} abgeleitet={pruefung.nachweisDetails[n.id]} />)}
+    </Block>
+  )
+
+  const offeneBauteilWerte = pruefung.ergebnisse.filter((r) => r.ergebnis !== ERGEBNIS.ERFUELLT && r.ergebnis !== ERGEBNIS.NICHT_ERFUELLT).length
+  const bauteilBlock = (
+    <Block key={BAUTEIL_BLOCK} titel={BAUTEIL_BLOCK}
+      offen={!!offen[BAUTEIL_BLOCK]} umschalten={() => umschalten(BAUTEIL_BLOCK)}
+      gesamt={pruefung.ergebnisse.length} fehlend={offeneBauteilWerte}
+      label={projekt.bauteile.length ? null : 'optional'}>
+      <Bauteile projekt={projekt} setProjekt={setProjekt} pruefung={pruefung} material={aEff.p2}
+        upload={<KiUpload projekt={projekt} setProjekt={setProjekt} felder={pruefung.felder} />} />
     </Block>
   )
 
@@ -119,12 +212,15 @@ export default function App() {
         spaeterAb={b.fragen.every((f) => e.kategorie(f) === 'später') ? e.giltAbFuer(b.fragen[0]) : null}>
         {b.fragen.map((f) => {
           const spaeter = e.kategorie(f) === 'später'
-          return <Feld key={f.id} frage={f} wert={antworten[f.id]} setze={setze}
-            fehlt={!spaeter && !e.beantwortet(f)} spaeter={spaeter ? e.giltAbFuer(f) : null} />
+          return <Feld key={f.id} frage={f} wert={aEff[f.id] ?? antworten[f.id]} setze={setze}
+            fehlt={!spaeter && !e.beantwortet(f)} spaeter={spaeter ? e.giltAbFuer(f) : null}
+            abgeleitet={pruefung.details[f.id]} weitereNachweise={!!antworten[f.id + BESTAETIGT]} setzeWeitere={(v) => setze(f.id + BESTAETIGT, v)} />
         })}
       </Block>,
     )
+    if (b.name === 'Profil') inhalt.push(bauteilBlock)
   })
+  if (!alleBloecke.some((b) => b.name === 'Profil')) inhalt.unshift(bauteilBlock)
   if (posNormen < 0) inhalt.push(nachweisBlock)
 
   return (
@@ -136,6 +232,7 @@ export default function App() {
       <header className="kopf">
         <p className="marke">DoC_fix</p>
         <h1>Konformitätserklärung für Verpackungen</h1>
+        {UMFANG && <p className="umfang">{UMFANG}</p>}
         <p className="unter">nach Art. 39 und Anhang VIII der Verordnung (EU) 2025/40 (PPWR)</p>
       </header>
 
@@ -147,7 +244,12 @@ export default function App() {
       <div className="leiste">
         <button type="button" className="link" onClick={() => alle(true)}>Alle Bereiche aufklappen</button>
         <button type="button" className="link" onClick={() => alle(false)}>Alle zuklappen</button>
+        <span className="projekt">
+          <button type="button" className="link" onClick={speichern}>Projekt speichern (Datei)</button>
+          <label className="link">Projekt öffnen<input type="file" accept=".json,.pdf,application/json,application/pdf" hidden onChange={oeffnen} /></label>
+        </span>
       </div>
+      {meldung && <p className="meldung" role="status">{meldung}</p>}
 
       <main>
         {inhalt}
@@ -183,7 +285,7 @@ export default function App() {
         Die mit diesem Tool erstellte Konformitätserklärung ist ein Entwurf auf Basis Ihrer Angaben. Sie stellt
         keine Rechtsberatung dar und begründet keine Gewähr für die rechtliche Konformität der Verpackung. Die
         alleinige Verantwortung für die Ausstellung der Konformitätserklärung trägt der Erzeuger (Anhang VIII
-        Nr. 3 der Verordnung (EU) 2025/40). Ihre Eingaben verlassen Ihren Browser nicht und werden nicht gespeichert.
+        Nr. 3 der Verordnung (EU) 2025/40). Ihre Eingaben bleiben in Ihrem Browser. Hochgeladene Lieferantendokumente werden zum Auslesen an einen KI-Dienst (Google Gemini) übermittelt; wir speichern sie nicht.
       </footer>
     </div>
   )
