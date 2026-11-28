@@ -1,6 +1,6 @@
 /**
  * Kopiert Testdokumente und gespeicherte KI-Antworten in die Vorschau (dist-vorschau/vorschau/).
- * Nur für das Claude-Artefakt — die Live-Version (dist/) enthält sie nicht.
+ * KI-Antworten nur für das Claude-Artefakt. Die Testdokumente kopiert für die Live-Version scripts/testdokumente-live.mjs.
  */
 import { cpSync, readdirSync } from 'node:fs'
 

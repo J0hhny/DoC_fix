@@ -6,10 +6,10 @@
  * Bauteilen mit Lebensmittelkontakt. Der Lieferant des Bauteils wird aus dem
  * Aussteller des Dokuments übernommen, wenn er noch leer ist (U5).
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { STUFE_TEXT, gilt, bewerte, ampel, fmt } from './bauteile.js'
 import { keyLaden, verarbeite, ZITAT, messwertVorschlag } from './ki.js'
-import { VORSCHAU, TESTSAETZE, testdokumenteLaden } from './vorschau.js'
+import { VORSCHAU, testdokumenteLaden } from './vorschau.js'
 
 const STATUS_TEXT = { wartet: 'wartet', 'läuft': 'wird gelesen …', fertig: 'gelesen', fehler: 'Fehler' }
 const ZITAT_KLASSE = { [ZITAT.GEFUNDEN]: 'erg-ok', [ZITAT.NICHT_GEFUNDEN]: 'erg-nein', [ZITAT.SCAN]: 'erg-unklar' }
@@ -24,7 +24,7 @@ export const stufeAmpel = (s) => (['S1', 'S2', 'S3'].includes(s) ? 'gruen' : s =
 const rang = (s) => ['S1', 'S2', 'S3', 'S4', 'S5', 'n. z.'].indexOf(s)
 const kurz = (t, n = 140) => (t && t.length > n ? t.slice(0, n - 1) + '…' : t)
 
-export default function DemoUpload({ projekt, setProjekt, felder }) {
+export default function DemoUpload({ projekt, setProjekt, felder, testfall }) {
   const key = keyLaden()
   const [laeuft, setLaeuft] = useState(false)
   const [ziehen, setZiehen] = useState(false)
@@ -70,6 +70,9 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
       await verarbeite(pdfs, key, bekannt, melde)
     } finally { setLaeuft(false) }
   }
+
+  // Testfall aus dem Bauteilbereich: PDFs laden, sobald das geleerte Projekt gerendert ist
+  useEffect(() => { if (testfall) testdokumente(testfall.satz) }, [testfall?.n]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function testdokumente(satz) {
     try { await dateienNehmen(await testdokumenteLaden(satz)) } catch (e) { setHinweis('Testdokumente nicht ladbar: ' + e.message) }
@@ -144,9 +147,6 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
           {laeuft ? 'Dokumente werden gelesen …' : 'PDFs hierher ziehen oder klicken'}
           <input type="file" accept="application/pdf,.pdf" multiple hidden onChange={(e) => { dateienNehmen(e.target.files); e.target.value = '' }} />
         </label>
-        {VORSCHAU && Object.entries(TESTSAETZE).map(([satz, liste]) => (
-          <button key={satz} type="button" className="zweit" disabled={laeuft} onClick={() => testdokumente(satz)}>{liste.length} Testdokumente {satz}</button>
-        ))}
       </div>
       {VORSCHAU && <p className="klein">Vorschau: Die KI-Antworten sind gespeicherte Gemini-Ergebnisse zu den Testdokumenten (auch per Datei-Upload aus dem Projektordner). Andere PDFs werden hier nicht ausgelesen.</p>}
       {hinweis && <p className="meldung" role="status">{hinweis}</p>}

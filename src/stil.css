@@ -410,3 +410,7 @@ i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
 .kikarte.zu .kikopf { margin: 0; align-items: baseline; flex-wrap: wrap; }
 .kikopf .link { margin-left: auto; }
 .kikarte.zu .zugeordnet { margin: 0; }
+/* Testfälle im Bauteilbereich (28.11.) */
+.testfall { border: 1px dashed var(--akzent); border-radius: 6px; padding: 0.7rem 0.9rem; margin: 0.4rem 0 1rem; background: #fff; }
+.testfall p { margin: 0.25rem 0 0.5rem; }
+.testfallknoepfe { display: flex; flex-wrap: wrap; gap: 0.5rem; }

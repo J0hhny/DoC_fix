@@ -10,7 +10,7 @@
 import { ampel, gilt } from './bauteile.js'
 import { wertText, folgeText } from './Herleitung.jsx'
 import { FELD_NAME } from './DemoUpload.jsx'
-import { useState } from 'react'
+import { useState, cloneElement } from 'react'
 import { anfragen, anfrageText, anzahlPunkte, LUECKE } from './anfrage.js'
 import Aufbauskizze from './Aufbauskizze.jsx'
 
@@ -26,6 +26,12 @@ const VORSCHLAG = {
   Holz: [['Holzkiste', 'Holz', true], ['Befestigung', 'Stahl', false]],
 }
 
+/** Testfälle (fiktive Dokumente in vorschau/testdokumente, Lösungen im Projektordner). Ein Klick legt die Bauteile an und lädt die PDFs, zuordnen tut der Nutzer. */
+const TESTFAELLE = {
+  Käseverpackung: [['Schale', 'APET/PE', true], ['Deckelfolie', 'PET/PE', true], ['Druckfarbe', 'Nitrocellulose-Farbe (außen)', false], ['Etikett', 'Papier mit Haftkleber', false]],
+  Honigglas: [['Glas', 'Kalk-Natron-Glas', true], ['Deckel', 'Metall, innen lackiert, mit Dichtung', true], ['Etikett', 'PP-Folie', false]],
+}
+
 const kurz = (t, n = 90) => (t && t.length > n ? t.slice(0, n - 1) + '…' : t)
 
 export default function DemoBauteile({ projekt, setProjekt, pruefung, material, upload, antworten }) {
@@ -36,9 +42,34 @@ export default function DemoBauteile({ projekt, setProjekt, pruefung, material, 
   const weg = (id) => aendern((p) => { p.bauteile = p.bauteile.filter((b) => b.id !== id); delete p.werte[id]; return p })
   const vorschlag = VORSCHLAG[material]
   const dokName = (id) => dokumente.find((d) => d.id === id)?.name || ''
+  const [testfall, setTestfall] = useState(null) // { satz, n } → DemoUpload lädt die PDFs
+  const [rueckfrage, setRueckfrage] = useState('')
+  function testfallLaden(satz) {
+    if ((bauteile.length || (projekt.ki || []).length) && rueckfrage !== satz) { setRueckfrage(satz); return }
+    setRueckfrage('')
+    aendern((p) => {
+      p.bauteile = TESTFAELLE[satz].map(([name, mat, lm]) => ({ id: neueId(), name, material: mat, lm, lieferant: '', teilVon: null }))
+      p.werte = {}; p.ki = []; p.dokumente = []; p.form = ''
+      return p
+    })
+    setTestfall({ satz, n: Date.now() })
+  }
 
   return (
     <div className="bauteile">
+      <div className="testfall">
+        <strong>Testfall ausprobieren</strong>
+        <p className="klein">Ein Klick legt die Bauteile an und lädt die (fiktiven) Lieferantendokumente. Die KI liest sie aus, das Zuordnen machen Sie in Schritt 2 selbst.</p>
+        <div className="testfallknoepfe">
+          {Object.entries(TESTFAELLE).map(([satz, teile]) => (
+            <button key={satz} type="button" className="zweit" onClick={() => testfallLaden(satz)}>
+              Testfall {satz} <span className="klein">({teile.length} Bauteile)</span>
+            </button>
+          ))}
+        </div>
+        {rueckfrage && <p className="abbruch">Ersetzt Ihre Bauteile und Dokumente. Zum Bestätigen „Testfall {rueckfrage}“ noch einmal klicken.</p>}
+      </div>
+
       <h3>1. Bauteile Ihrer Verpackung</h3>
       <p className="klein">Lebensmittelkontakt entscheidet, ob ein Bauteil auch PFAS nachweisen muss (Art. 5 Abs. 5).</p>
       {bauteile.length === 0 && (vorschlag ? (
@@ -71,7 +102,7 @@ export default function DemoBauteile({ projekt, setProjekt, pruefung, material, 
       <button type="button" className="link" onClick={neu}>+ Bauteil</button>
 
       <h3>2. Lieferantendokumente hochladen</h3>
-      {upload}
+      {upload && cloneElement(upload, { testfall })}
 
       <h3>3. Aufbauskizze</h3>
       <p className="klein">Entsteht aus den Bauteilen und den Daten der zugeordneten Lieferantendokumente (Material, Maße, Gewicht). Schematisch, ohne Prüfergebnis.</p>

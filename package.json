@@ -9,7 +9,7 @@
     "predev": "node scripts/katalog-bauen.mjs",
     "dev": "vite",
     "prebuild": "node scripts/katalog-bauen.mjs",
-    "build": "vite build",
+    "build": "vite build && node scripts/testdokumente-live.mjs",
     "preview": "vite preview",
     "build:vorschau": "node scripts/katalog-bauen.mjs && VORSCHAU=1 vite build && node scripts/vorschau-dateien.mjs",
     "build:einzeldatei": "EINZELDATEI=1 vite build && node scripts/einzeldatei.mjs"
