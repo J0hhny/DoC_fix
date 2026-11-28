@@ -166,3 +166,35 @@ export function zahlAusText(text) {
   const einheit = m[3].toLowerCase().replace('ug/kg', 'µg/kg')
   return { wert: m[2].replace(',', '.'), einheit, kleinerAls: !!m[1] }
 }
+
+// ------------------------------------------------------------------ Prompt v3: Messwerte rechnet der Code
+const ZIEL_EINHEIT = { df1: 'mg/kg', df2: 'µg/kg', df3: 'µg/kg', df4: 'mg/kg' }
+const IN_MGKG = { 'mg/kg': 1, ppm: 1, 'µg/kg': 0.001, ppb: 0.001, '%': 10000 }
+const zahlText = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',')
+
+/**
+ * Messwert-Vorschlag für eine Aussage. Liefert die KI (v3) eine Liste `messwerte`, rechnet der Code:
+ * Summe bzw. Gesamtwert, wenn genannt · df2 = höchster Einzelwert · sonst Summe der Einzelwerte (Obergrenze).
+ * Ohne Liste (v2-Antworten) wie bisher die erste Zahl aus dem Text.
+ * → { wert, einheit, kleinerAls, rechenweg }
+ */
+export function messwertVorschlag(a) {
+  const liste = (a?.messwerte || []).filter((m) => Number.isFinite(m.wert) && IN_MGKG[m.einheit])
+  if (!liste.length) return { ...zahlAusText(a?.aussage || a?.zitat), rechenweg: '' }
+  const ziel = ZIEL_EINHEIT[a.datenfeld] || 'mg/kg'
+  const um = (m) => (m.wert * IN_MGKG[m.einheit]) / IN_MGKG[ziel]
+  const kleiner = (m) => m.vergleich === '<'
+  const aus = (m, weg) => ({ wert: zahlText(um(m)).replace(',', '.'), einheit: ziel, kleinerAls: kleiner(m), rechenweg: weg })
+  const gesamt = liste.find((m) => /summe|gesamt|total|tof|fluor/i.test(m.stoff))
+  if (a.datenfeld === 'df2') {
+    const max = liste.reduce((x, m) => (um(m) > um(x) ? m : x))
+    return aus(max, liste.length > 1 ? `höchster von ${liste.length} Einzelwerten` : '')
+  }
+  if (gesamt || liste.length === 1) return aus(gesamt || liste[0], '')
+  const summe = liste.reduce((s, m) => s + um(m), 0)
+  const alleKleiner = liste.every(kleiner)
+  return {
+    wert: String(Math.round(summe * 1000) / 1000), einheit: ziel, kleinerAls: alleKleiner,
+    rechenweg: 'Summe: ' + liste.map((m) => `${m.stoff} ${m.vergleich} ${zahlText(m.wert)}`).join(' + ') + ` = ${alleKleiner ? '< ' : ''}${zahlText(summe)} ${ziel}`,
+  }
+}

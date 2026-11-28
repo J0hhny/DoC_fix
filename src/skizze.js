@@ -35,6 +35,8 @@ const REGELN = [
   ['koerper', /schale|glas|beh(ä|ae)lter|dose|flasche|beutel|schachtel|becher|kiste|tray|tube|eimer/],
 ]
 const klein = (s) => String(s || '').toLowerCase()
+/** Rolle aus der KI-Antwort (Prompt v3) → Rolle der Skizze. */
+const KI_ROLLE = { 'Körper': 'koerper', Verschluss: 'verschluss', Dichtung: 'dichtung', 'Lack/Beschichtung': 'lack', Druck: 'druck', Etikett: 'etikett', Sonstiges: 'sonstig' }
 const nichtKA = (s) => (s && s !== 'k. A.' ? s : '')
 
 /** Rolle aus dem Namen raten, erst danach aus dem Material (sonst wird „Deckel, lackiert“ zu Lack). */
@@ -53,7 +55,7 @@ export function formRaten(koerper) {
 
 /** Wirksame Aufbaudaten je Bauteil: gesetzt vom Nutzer, sonst aus dem KI-Dokument, sonst geraten. */
 export function aufbau(bauteile, formGesetzt) {
-  const roh = bauteile.map((b) => ({ b, rolle: b.rolle || rolleRaten(b), rolleGeraten: !b.rolle }))
+  const roh = bauteile.map((b) => ({ b, rolle: b.rolle || KI_ROLLE[b.daten?.rolle] || rolleRaten(b), rolleGeraten: !b.rolle }))
   const koerper = roh.find((x) => x.rolle === 'koerper')
   const form = formGesetzt || formRaten(koerper?.b)
   const verschluss = roh.find((x) => x.rolle === 'verschluss')

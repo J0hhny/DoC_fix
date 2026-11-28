@@ -128,6 +128,20 @@
           },
           "rezyklatanteil": {
             "type": "string"
+          },
+          "rolle": {
+            "type": "string",
+            "enum": [
+              "Körper",
+              "Verschluss",
+              "Dichtung",
+              "Lack/Beschichtung",
+              "Druck",
+              "Etikett",
+              "Sonstiges",
+              "k. A."
+            ],
+            "description": "Funktion des Artikels in der fertigen Verpackung."
           }
         },
         "required": [
@@ -141,7 +155,8 @@
           "mehrweg",
           "gewicht",
           "masse",
-          "rezyklatanteil"
+          "rezyklatanteil",
+          "rolle"
         ]
       }
     },
@@ -197,6 +212,48 @@
           },
           "zitat": {
             "type": "string"
+          },
+          "messwerte": {
+            "type": "array",
+            "description": "Alle Zahlen zu diesem Feld, wie im Dokument. Leer, wenn keine Zahl genannt ist.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stoff": {
+                  "type": "string",
+                  "description": "z. B. 'Summe Pb+Cd+Hg+Cr VI', 'Pb', 'PFAS Summe', 'höchster Einzelwert', 'TOF'"
+                },
+                "vergleich": {
+                  "type": "string",
+                  "enum": [
+                    "<",
+                    "≤",
+                    "=",
+                    "≥",
+                    ">"
+                  ]
+                },
+                "wert": {
+                  "type": "number"
+                },
+                "einheit": {
+                  "type": "string",
+                  "enum": [
+                    "mg/kg",
+                    "µg/kg",
+                    "ppm",
+                    "ppb",
+                    "%"
+                  ]
+                }
+              },
+              "required": [
+                "stoff",
+                "vergleich",
+                "wert",
+                "einheit"
+              ]
+            }
           }
         },
         "required": [
@@ -206,7 +263,8 @@
           "grundlage",
           "rechtsbezug",
           "seite",
-          "zitat"
+          "zitat",
+          "messwerte"
         ]
       }
     },

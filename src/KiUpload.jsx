@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from 'react'
 import { anzeigeName, blaetter, STUFE_TEXT, abStufe } from './bauteile.js'
-import { keyLaden, keyPruefen, verarbeite, ZITAT, zahlAusText } from './ki.js'
+import { keyLaden, keyPruefen, verarbeite, ZITAT, messwertVorschlag } from './ki.js'
 
 const STATUS_TEXT = { wartet: 'wartet', 'läuft': 'wird gelesen …', fertig: 'fertig', fehler: 'Fehler', bekannt: 'schon gelesen' }
 const ZITAT_KLASSE = { [ZITAT.GEFUNDEN]: 'erg-ok', [ZITAT.NICHT_GEFUNDEN]: 'erg-nein', [ZITAT.SCAN]: 'erg-unklar' }
@@ -79,7 +79,7 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
     if (!ziele.length) return
     aendern((p) => {
       for (const a of zeilen) {
-        const z = zahlen[`${eintrag.sha}:${a.datenfeld}`] || zahlAusText(a.aussage || a.zitat)
+        const z = zahlen[`${eintrag.sha}:${a.datenfeld}`] || messwertVorschlag(a)
         for (const bid of ziele) {
           const b = (p.werte[bid] ||= {})
           const alt = b[a.datenfeld]
@@ -178,7 +178,7 @@ export default function KiUpload({ projekt, setProjekt, felder }) {
                     {zeilen.map((a) => {
                       const zs = x.pruefung?.zitate?.[a.datenfeld]
                       const zk = `${x.sha}:${a.datenfeld}`
-                      const z = zahlen[zk] || zahlAusText(a.aussage || a.zitat)
+                      const z = zahlen[zk] || messwertVorschlag(a)
                       return (
                         <tr key={a.datenfeld} className={aktiveFelder.has(a.datenfeld) ? '' : 'inaktiv'}>
                           <td>{FELD_NAME[a.datenfeld] || a.datenfeld}

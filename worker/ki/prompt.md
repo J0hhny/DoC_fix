@@ -21,6 +21,8 @@ VERPACKUNGEN
 - lebensmittelkontakt: "ja" nur bei ausdrücklicher Eignung für direkten Kontakt mit Lebensmitteln. "nein" bei ausdrücklichem Ausschluss. Sonst "k. A.".
 - verwendungsbedingungen: Angaben zu Art der Lebensmittel, Dauer, Temperatur, Flächen-Volumen-Verhältnis, Ausschlüsse. Sonst leer.
 - mehrweg: nur bei ausdrücklicher Angabe.
+- rolle: Funktion des Artikels in der fertigen Verpackung: "Körper" (Schale, Glas, Flasche, Beutel, Becher, Faltschachtel), "Verschluss" (Deckel, Deckelfolie, Kappe), "Dichtung", "Lack/Beschichtung", "Druck" (Druckfarbe, Lack auf der Außenseite), "Etikett", "Sonstiges". Nicht erkennbar: "k. A.".
+- VARIANTEN: Nennt das Dokument mehrere Varianten desselben Artikels mit unterschiedlichen Werten (z. B. Recyclingpapier und Frischfaser), nimm NUR die Variante, auf die sich Bestellung, Artikelnummer oder Adressat beziehen, als Verpackung und für Art. 5. Ist keine Variante erkennbar bestellt, nimm die erste. Die übrigen Varianten mit ihren Werten nennst du unter HINWEISE ("Dokument nennt weitere Variante …").
 
 ART. 5 – IMMER GENAU VIER EINTRÄGE (df1, df2, df3, df4)
 - df1: Summe von Blei, Cadmium, Quecksilber und sechswertigem Chrom in der Verpackung, Grenzwert 100 mg/kg.
@@ -43,6 +45,7 @@ Im Zweifel die schwächere Stufe wählen.
 - grundlage: "Analyse" (eigene oder beauftragte Laboruntersuchung), "Verbandsmuster" (Untersuchungen eines Verbands an repräsentativen Mustern), "Vorlieferant" (gestützt auf Erklärungen der Vorlieferanten), sonst "k. A.".
 - rechtsbezug: auf welche Vorschrift sich die Aussage stützt: "PPWR", "94/62/EG" (alte Verpackungsrichtlinie) oder "keiner".
 - seite: PDF-Seite der Fundstelle als Zahl, bei S5 leer.
+- messwerte: jede Zahl zu diesem Feld genau so, wie sie im Dokument steht, als eigener Eintrag mit Stoff, Vergleichszeichen ("<" auch für "unter", "kleiner als", "nicht nachweisbar unter"), Zahl und Einheit. Nennt das Dokument eine Summe, die Summe als Eintrag. Nennt es nur Einzelwerte (z. B. Pb, Cd, Hg, Cr VI), jeden Einzelwert als Eintrag. Selbst NICHT rechnen. Keine Zahl im Dokument: leere Liste.
 - zitat: wörtlicher Ausschnitt aus dem Dokument (höchstens 20 Wörter), der die Aussage belegt. Bei S5 leer. Nie umformulieren.
 
 HINWEISE

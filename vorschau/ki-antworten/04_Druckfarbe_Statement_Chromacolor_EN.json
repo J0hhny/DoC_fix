@@ -1,68 +1,99 @@
 {
-  "dokument": {
-    "aussteller": "Chromacolor Inks AG",
-    "ort_aussteller": "Basel (Switzerland)",
-    "adressat": "allgemein",
-    "dokumenttyp": "Stoff-/PPWR-Statement",
-    "datum": "2026-08-05",
-    "gueltig_bis": "2027-12-31",
-    "sprache": "EN",
-    "geltungsbereich": "Produktgruppe"
+ "dokument": {
+  "aussteller": "Chromacolor Inks AG",
+  "ort_aussteller": "Basel (Schweiz)",
+  "adressat": "allgemein",
+  "dokumenttyp": "Stoff-/PPWR-Statement",
+  "datum": "2026-08-05",
+  "gueltig_bis": "2027-12-31",
+  "sprache": "EN",
+  "geltungsbereich": "Produktgruppe"
+ },
+ "verpackungen": [
+  {
+   "bezeichnung": "ChromaFlex NC nitrocellulose-based printing inks for flexible food packaging",
+   "artikelnummer": "CF-NC-1000 to CF-NC-1999",
+   "verpackungsart": "k. A.",
+   "materialien": "nitrocellulose-based printing inks",
+   "materialgruppe": "k. A.",
+   "lebensmittelkontakt": "nein",
+   "verwendungsbedingungen": "surface printing on the non-food-contact side",
+   "mehrweg": "k. A.",
+   "gewicht": "k. A.",
+   "masse": "k. A.",
+   "rezyklatanteil": "k. A.",
+   "rolle": "Druck"
+  }
+ ],
+ "art5": [
+  {
+   "datenfeld": "df1",
+   "stufe": "S1",
+   "aussage": "Maximalkonzentrationen für Blei (< 10 mg/kg), Cadmium (< 5 mg/kg), Quecksilber (< 5 mg/kg) und Chrom VI (< 10 mg/kg) im getrockneten Druckfarbenfilm genannt.",
+   "grundlage": "Analyse",
+   "rechtsbezug": "PPWR",
+   "seite": "1",
+   "zitat": "Based on raw material screening and periodic analysis (latest report 2026-06), the following maximum concentrations",
+   "messwerte": [
+    {
+     "stoff": "Lead (Pb)",
+     "vergleich": "<",
+     "wert": 10,
+     "einheit": "mg/kg"
+    },
+    {
+     "stoff": "Cadmium (Cd)",
+     "vergleich": "<",
+     "wert": 5,
+     "einheit": "mg/kg"
+    },
+    {
+     "stoff": "Mercury (Hg)",
+     "vergleich": "<",
+     "wert": 5,
+     "einheit": "mg/kg"
+    },
+    {
+     "stoff": "Chromium VI",
+     "vergleich": "<",
+     "wert": 10,
+     "einheit": "mg/kg"
+    }
+   ]
   },
-  "verpackungen": [
-    {
-      "bezeichnung": "ChromaFlex NC nitrocellulose-based printing inks for flexible food packaging",
-      "artikelnummer": "CF-NC-1000 to CF-NC-1999",
-      "verpackungsart": "k. A.",
-      "materialien": "Druckfarben (nitrocellulose-based printing inks)",
-      "materialgruppe": "k. A.",
-      "lebensmittelkontakt": "nein",
-      "verwendungsbedingungen": "surface printing on the non-food-contact side",
-      "mehrweg": "k. A.",
-      "gewicht": "k. A.",
-      "masse": "k. A.",
-      "rezyklatanteil": "k. A."
-    }
-  ],
-  "art5": [
-    {
-      "datenfeld": "df1",
-      "stufe": "S1",
-      "aussage": "Schwermetallkonzentrationen im getrockneten Farbfilm: Pb < 10 mg/kg, Cd < 5 mg/kg, Hg < 5 mg/kg, Cr VI < 10 mg/kg (Summe weit unter 100 mg/kg).",
-      "grundlage": "Analyse",
-      "rechtsbezug": "PPWR",
-      "seite": "1",
-      "zitat": "Based on raw material screening and periodic analysis (latest report 2026-06), the following maximum concentrations in the dried"
-    },
-    {
-      "datenfeld": "df2",
-      "stufe": "S4",
-      "aussage": "PFAS werden nicht absichtlich zugesetzt; keine analytische Prüfung durchgeführt.",
-      "grundlage": "k. A.",
-      "rechtsbezug": "PPWR",
-      "seite": "1",
-      "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS"
-    },
-    {
-      "datenfeld": "df3",
-      "stufe": "S4",
-      "aussage": "PFAS werden nicht absichtlich zugesetzt; keine analytische Prüfung durchgeführt.",
-      "grundlage": "k. A.",
-      "rechtsbezug": "PPWR",
-      "seite": "1",
-      "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS"
-    },
-    {
-      "datenfeld": "df4",
-      "stufe": "S4",
-      "aussage": "PFAS werden nicht absichtlich zugesetzt; keine analytische Prüfung durchgeführt.",
-      "grundlage": "k. A.",
-      "rechtsbezug": "PPWR",
-      "seite": "1",
-      "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS"
-    }
-  ],
-  "hinweise": [
-    "Das Dokument bezieht sich auf Druckfarben (Vorprodukt / Bestandteil) und ersetzt laut Aussteller nicht die Konformitätserklärung für die fertige Verpackung."
-  ]
+  {
+   "datenfeld": "df2",
+   "stufe": "S4",
+   "aussage": "PFAS nicht absichtlich zugesetzt, keine analytische Untersuchung durchgeführt.",
+   "grundlage": "k. A.",
+   "rechtsbezug": "PPWR",
+   "seite": "1",
+   "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS has been carried out.",
+   "messwerte": []
+  },
+  {
+   "datenfeld": "df3",
+   "stufe": "S4",
+   "aussage": "PFAS nicht absichtlich zugesetzt, keine analytische Untersuchung durchgeführt.",
+   "grundlage": "k. A.",
+   "rechtsbezug": "PPWR",
+   "seite": "1",
+   "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS has been carried out.",
+   "messwerte": []
+  },
+  {
+   "datenfeld": "df4",
+   "stufe": "S4",
+   "aussage": "PFAS nicht absichtlich zugesetzt, keine analytische Untersuchung durchgeführt.",
+   "grundlage": "k. A.",
+   "rechtsbezug": "PPWR",
+   "seite": "1",
+   "zitat": "Per- and polyfluoroalkyl substances are not intentionally added to ChromaFlex NC inks. No analytical testing for PFAS has been carried out.",
+   "messwerte": []
+  }
+ ],
+ "hinweise": [
+  "Das Dokument weist ausdrücklich darauf hin, dass keine analytischen Prüfungen auf PFAS durchgeführt wurden.",
+  "Das Dokument ersetzt laut Aussteller keine Konformitätserklärung für die fertige Verpackung."
+ ]
 }

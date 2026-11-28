@@ -8,7 +8,7 @@
  */
 import { useState } from 'react'
 import { STUFE_TEXT, gilt, bewerte, ampel, fmt } from './bauteile.js'
-import { keyLaden, verarbeite, ZITAT, zahlAusText } from './ki.js'
+import { keyLaden, verarbeite, ZITAT, messwertVorschlag } from './ki.js'
 import { VORSCHAU, TESTSAETZE, testdokumenteLaden } from './vorschau.js'
 
 const STATUS_TEXT = { wartet: 'wartet', 'läuft': 'wird gelesen …', fertig: 'gelesen', fehler: 'Fehler' }
@@ -76,7 +76,7 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
 
   const gewaehlt = (sha) => auswahl[sha] || new Set()
   const umschalten = (sha, id) => setAuswahl((a) => { const s = new Set(a[sha] || []); s.has(id) ? s.delete(id) : s.add(id); return { ...a, [sha]: s } })
-  const zahlVon = (sha, a) => zahlen[`${sha}:${a.datenfeld}`] || zahlAusText(a.aussage || a.zitat)
+  const zahlVon = (sha, a) => zahlen[`${sha}:${a.datenfeld}`] || messwertVorschlag(a)
 
   /** Aussagen auf die gewählten Bauteile übernehmen. Stärkere bestätigte Aussagen bleiben stehen. */
   function uebernehmen(eintrag, zeilen) {
@@ -91,7 +91,7 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
         const v = eintrag.ergebnis?.verpackungen?.[0]
         const abgelaufen = !!eintrag.pruefung?.abgelaufen
         if (bt && v && (!bt.daten || (bt.daten.abgelaufen && !abgelaufen))) {
-          bt.daten = { dokument: eintrag.dokId, dokName: eintrag.name, abgelaufen, bezeichnung: v.bezeichnung || '', artikelnummer: v.artikelnummer || '', materialien: v.materialien || '', masse: v.masse || '', gewicht: v.gewicht || '' }
+          bt.daten = { dokument: eintrag.dokId, dokName: eintrag.name, abgelaufen, bezeichnung: v.bezeichnung || '', artikelnummer: v.artikelnummer || '', materialien: v.materialien || '', masse: v.masse || '', gewicht: v.gewicht || '', rolle: v.rolle || '' }
         }
         for (const a of zeilen) {
           if (!gilt(feldNachId.get(a.datenfeld), bt)) continue // PFAS nur bei Lebensmittelkontakt
@@ -191,6 +191,7 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
                           <td>
                             <span className={'chip amp-' + farbe}>{a.stufe}</span>
                             <div className="klein">{STUFE_TEXT[a.stufe]}{r1 ? ` · ${z.kleinerAls ? '< ' : ''}${z.wert} ${z.einheit}` : ''}</div>
+                            {r1 && z.rechenweg && <div className="klein">{z.rechenweg}</div>}
                             {r1 && !grau && feld && <div className="klein">Grenzwert {feld.vergleich === '≤' ? 'höchstens' : 'unter'} {fmt(feld.grenzwert)} {feld.einheit}{r1.grund ? ` — ${r1.grund}` : ''}</div>}
                           </td>
                           <td>
