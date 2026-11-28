@@ -31,6 +31,7 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
   const [auswahl, setAuswahl] = useState({}) // sha → Set(bauteilId)
   const [zahlen, setZahlen] = useState({}) // `${sha}:${df}` → { wert, einheit, kleinerAls }
   const [hinweis, setHinweis] = useState('')
+  const [aufgeklappt, setAufgeklappt] = useState(() => new Set()) // sha zugeordneter Karten, die offen bleiben (U13)
   const ki = projekt.ki || []
   const teile = projekt.bauteile
   const aktiv = new Set(felder.map((f) => f.id))
@@ -114,6 +115,7 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
       return p
     })
     setAuswahl((a) => ({ ...a, [eintrag.sha]: new Set() }))
+    setAufgeklappt((s) => { const n = new Set(s); n.delete(eintrag.sha); return n }) // nach dem Übernehmen einklappen
   }
 
   /** Welche Bauteile haben schon Werte aus diesem Dokument? */
@@ -148,7 +150,14 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
       </div>
       {VORSCHAU && <p className="klein">Vorschau: Die KI-Antworten sind gespeicherte Gemini-Ergebnisse zu den Testdokumenten (auch per Datei-Upload aus dem Projektordner). Andere PDFs werden hier nicht ausgelesen.</p>}
       {hinweis && <p className="meldung" role="status">{hinweis}</p>}
-      {ki.length > 0 && <p className="klein">{ki.filter((x) => x.status === 'fertig').length} von {ki.length} Dokumenten gelesen</p>}
+      {ki.length > 0 && (() => {
+        // Fortschritt (U13): gelesen · zugeordnet · ohne verwertbare Aussage
+        const fertig = ki.filter((x) => x.status === 'fertig')
+        const verwertbar = fertig.filter((x) => (x.ergebnis?.art5 || []).some((a) => a.stufe !== 'S5' && aktiv.has(a.datenfeld)))
+        const zug = verwertbar.filter((x) => x.dokId && zugeordnet(x.dokId).length)
+        const ohne = fertig.length - verwertbar.length
+        return <p className="fortschritt"><strong>{zug.length} von {verwertbar.length}</strong> Dokumenten zugeordnet · {fertig.length} von {ki.length} gelesen{ohne ? ` · ${ohne} ohne verwertbare Aussage` : ''}</p>
+      })()}
 
       {ki.map((x) => {
         const d = x.ergebnis?.dokument || {}
@@ -160,12 +169,24 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
         // Für welche Bauteile gilt das Dokument? Gewählte, sonst schon zugeordnete. Haben alle keinen LM-Kontakt, ist PFAS grau.
         const bezug = gewaehlt(x.sha).size ? teile.filter((b) => gewaehlt(x.sha).has(b.id)) : schon
         const pfasUnnoetig = bezug.length > 0 && bezug.every((b) => b.lm === false)
+        const zu = schon.length > 0 && !aufgeklappt.has(x.sha)
+        const klappen = () => setAufgeklappt((s) => { const n = new Set(s); n.has(x.sha) ? n.delete(x.sha) : n.add(x.sha); return n })
+        if (zu) return (
+          <div key={x.sha} className="kikarte zu">
+            <div className="kikopf">
+              <strong>{x.name}</strong>
+              <span className="zugeordnet">✓ zugeordnet zu {schon.map((b) => b.name || 'Bauteil').join(', ')}</span>
+              <button type="button" className="link" onClick={klappen}>Details</button>
+            </div>
+          </div>
+        )
         return (
           <div key={x.sha} className="kikarte">
             <div className="kikopf">
               <strong>{x.name}</strong>
               <span className={'erg ' + (x.status === 'fertig' ? 'erg-ok' : x.status === 'fehler' ? 'erg-nein' : 'erg-unklar')}>{STATUS_TEXT[x.status]}</span>
               {x.status === 'fehler' && <button type="button" className="link" onClick={() => aendern((p) => { p.ki = p.ki.filter((y) => y.sha !== x.sha); return p })}>entfernen</button>}
+              {schon.length > 0 && <button type="button" className="link" onClick={klappen}>einklappen</button>}
             </div>
             {x.status === 'fehler' && <p className="klein">{x.fehler}</p>}
             {x.status === 'fertig' && (
@@ -201,7 +222,9 @@ export default function DemoUpload({ projekt, setProjekt, felder }) {
                             {a.stufe === 'S1' && !grau && (
                               <div className="wertzelle">
                                 Messwert: <input className="eingabe zahl" aria-label="Messwert" value={z.wert} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, wert: e.target.value } })} />
-                                <input className="eingabe zahl" aria-label="Einheit" value={z.einheit} placeholder="Einheit" onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, einheit: e.target.value } })} />
+                                <select className="eingabe zahl" aria-label="Einheit" value={z.einheit} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, einheit: e.target.value } })}>
+                                  <option value="">Einheit</option>{['mg/kg', 'µg/kg', 'ppm', 'ppb', '%'].map((e) => <option key={e} value={e}>{e}</option>)}
+                                </select>
                                 <label className="klein" title="Laborwert unter der Bestimmungsgrenze, z. B. „< 300 µg/kg“: Der echte Wert liegt irgendwo darunter."><input type="checkbox" checked={!!z.kleinerAls} onChange={(e) => setZahlen({ ...zahlen, [zk]: { ...z, kleinerAls: e.target.checked } })} /> Wert ist nur „kleiner als“ (unter Bestimmungsgrenze)</label>
                               </div>
                             )}

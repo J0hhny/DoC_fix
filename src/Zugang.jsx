@@ -34,6 +34,11 @@ export default function Zugang({ children }) {
         <p className="marke">DoC_fix</p>
         <h1>Konformitätserklärung für Verpackungen</h1>
       </header>
+      <div className="einleitung">
+        <p>In etwa 15 Minuten zum Entwurf Ihrer EU-Konformitätserklärung nach der Verpackungsverordnung (EU) 2025/40, mit Bauteilübersicht und Aufbauskizze.</p>
+        <p>Halten Sie bereit: Daten des Erzeugers, Angaben zur Verpackung und die Erklärungen oder Datenblätter Ihrer Lieferanten als PDF.</p>
+        <p>Eine KI liest die Lieferantendokumente aus, Sie prüfen und bestätigen jeden Wert.</p>
+      </div>
       <form className="zugang" onSubmit={(e) => { e.preventDefault(); pruefen(key) }}>
         <label htmlFor="zkey">Bitte geben Sie Ihren Zugangscode ein.</label>
         <input id="zkey" className="eingabe" autoFocus autoComplete="off" placeholder="DEMO"

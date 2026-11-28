@@ -402,3 +402,11 @@ i.chip { min-width: 0.9rem; height: 0.9rem; padding: 0; vertical-align: -2px; }
 .skzeile .skdetail { border: 0; border-top: 1px solid var(--linie); border-radius: 0 0 6px 6px; margin: 0; }
 .skfelder .breit { grid-column: 1 / -1; }
 .sktabelle { margin-top: 1rem; width: 100%; }
+/* U7 Startseite, U13 Upload-Karten (28.11.) */
+.einleitung { max-width: 34rem; margin: 0 0 1.2rem; }
+.einleitung p { margin: 0 0 0.45rem; }
+.fortschritt { margin: 0.6rem 0; padding: 0.45rem 0.7rem; background: var(--akzent-hell); border-radius: 6px; font-size: 0.9rem; }
+.kikarte.zu { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+.kikarte.zu .kikopf { margin: 0; align-items: baseline; flex-wrap: wrap; }
+.kikopf .link { margin-left: auto; }
+.kikarte.zu .zugeordnet { margin: 0; }

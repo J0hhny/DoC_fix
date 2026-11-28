@@ -62,7 +62,7 @@ export const VERANTWORTUNG = 'Die alleinige Verantwortung für die Ausstellung d
 /** Alles, was die Erklärung aus den Antworten ableitet. */
 export function erklaerungDaten(katalog, a) {
   const rechtsakte = []
-  if (a.p4 === 'ja') rechtsakte.push('Verordnung (EG) Nr. 1935/2004 (Materialien mit Lebensmittelkontakt)')
+  // U1 (28.11.): VO (EG) 1935/2004 wird nicht mehr genannt — das Tool prüft sie nicht.
   if (RECHTSAKTE_P6[a.p6]) rechtsakte.push(RECHTSAKTE_P6[a.p6])
 
   const normen = katalog.fragen
